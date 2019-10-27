@@ -19,16 +19,25 @@ const App = (props) => {
     setVotes(addVote)
     }
 
+  const highestVotes = Math.max.apply(null, votes)
+
+  const bestanecdote = votes.indexOf(highestVotes)
 
   return (
     <div>
       <div>
+      <h1>random anecdote</h1>
       <p>{props.anecdotes[selected]}</p>
       <p>has {votes[selected]} votes.</p>
       </div>
       <div>
         <button onClick={randomquote}>new anecdote</button>
         <button onClick={vote}>vote</button>
+      </div>
+      <div>
+        <h1>anecdotes with most votes</h1>
+        <p>{props.anecdotes[bestanecdote]}</p>
+        <p> with {highestVotes} votes.</p>
       </div>
     </div>
   )
