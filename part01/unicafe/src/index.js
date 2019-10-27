@@ -4,6 +4,12 @@ import ReactDOM from 'react-dom'
 
 const Statistics = ({good, neutral, bad, total}) => {
 
+  if (good === 0 && neutral === 0 && bad === 0)
+    return (
+      <div>
+        <p>No feedback given. <span role="img" aria-label="emoji">🙃</span></p>
+      </div>
+    )
   const average = Math.round(total / 3);
   const positive = (good / total)*100;
   const roundpositive = positive.toFixed(2) + "%"
@@ -41,8 +47,6 @@ const Button = ({handler, label}) => {
 
 }
 
-
-
 const App = (props) => {
   // save clicks of each button to own state
     const [good, setGood] = useState(0)
@@ -65,7 +69,6 @@ const App = (props) => {
     setTotal(total + 1)
     }
 
-
   return (
     <div>
       <div>
@@ -83,8 +86,6 @@ const App = (props) => {
     </div>
   )
 }
-
-
 
 
 ReactDOM.render(<App />, document.getElementById('root'))
