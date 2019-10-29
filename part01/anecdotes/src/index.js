@@ -9,7 +9,6 @@ const App = (props) => {
 
   const randomquote = () => {
     setSelected(Math.floor(Math.random() * props.anecdotes.length))
-
   }
 
   const vote = () => {
@@ -34,11 +33,13 @@ const App = (props) => {
         <button onClick={randomquote}>new anecdote</button>
         <button onClick={vote}>vote</button>
       </div>
-      <div>
-        <h1>anecdotes with most votes</h1>
-        <p>{props.anecdotes[bestanecdote]}</p>
-        <p> with {highestVotes} votes.</p>
-      </div>
+      {highestVotes > 0 &&
+        <div>
+          <h1>anecdotes with most votes</h1>
+          <p>{props.anecdotes[bestanecdote]}</p>
+          <p> with {highestVotes} votes.</p>
+        </div>
+      }
     </div>
   )
 }
