@@ -47,7 +47,4 @@ const Total = ({parts}) => {
 }
 
 
-
-
-
 export default Course
