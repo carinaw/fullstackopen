@@ -2,8 +2,8 @@ import React from 'react';
 import './App.css';
 import { useState } from 'react';
 
-const App = () => {
-  const [ persons, setPersons] = useState([
+const App = ({person}) => {
+  const [ persons, setPersons ] = useState([
     { name: 'Arto Hellas' }
   ])
 
@@ -15,12 +15,15 @@ const App = () => {
     console.log(event.target.value);
   }
 
+
+
   const handleaddName = (event) => {
     event.preventDefault()
 
+
 // Create an object called personObject where the value from the input field at time of submit click is stored.
     const personObject = {
-      name: {newName}
+      name: newName
     }
 
   // Add the personObject object that was created when button was clicked to the array persons using concat.
@@ -28,8 +31,13 @@ const App = () => {
 
 // Clear newName state (and therefore field again)
     setNewName('')
-
   }
+
+  const rows = () => persons.map(person =>
+      <Person key={person.name} person={person}/>)
+
+
+
 console.log('people', persons);
 
   return (
@@ -44,9 +52,18 @@ console.log('people', persons);
         </div>
       </form>
       <h2>Numbers</h2>
-        <div>{newName}</div>
+      <div>
+        {rows()}
+      </div>
     </div>
   )
 }
+
+const Person = ({person}) => {
+  return (
+    <li>{person.name}</li>
+  )
+}
+
 
 export default App
