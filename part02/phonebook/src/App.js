@@ -12,6 +12,7 @@ const App = ({person}) => {
 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
+  const [ filter, setFilter ] = useState('')
 
 // Whatever changes within the input field - it is set as a newName at that point.
   const handleNameChange = (event) => {
@@ -27,18 +28,11 @@ const App = ({person}) => {
   const handleaddInfo = (event) => {
     event.preventDefault()
 
-  // const handleFilterChange = (event) => {
-  //     setNewFilter(event.target.value)
-  //     console.log(event.target.value);
-  //   }
-
   // Create an object called personObject where the value from the input field at time of submit click is stored.
       const personObject = {
         name: newName,
         number: newNumber
       };
-
-
 
   // Use map for a reason I still need to comprehend and show alert if newName is already in the array.
     const allNames = persons.map(person => person.name)
@@ -47,25 +41,33 @@ const App = ({person}) => {
      else {
 // Add the personObject object that was created when button was clicked to the array persons using concat.
        setPersons(persons.concat(personObject));
-     }
-
   // Clear newName state (and therefore field again)
       setNewName('')
       setNewNumber('')
-  }
+    };
+};
 
-  const rows = () => persons.map(person =>
-    <div>
-      <Person key={person.name} person={person}/>
-    </div>)
+    const handleFilter = (event) => {
+      setFilter(event.target.value);
+}
+    const showFiltered = persons.filter(person => person.name.includes(filter));
 
+    const rows = () => showFiltered.map(person =>
+      <div>
+        <Person key={person.name} person={person}/>
+      </div>
+    )
 
 
 console.log('people', persons);
+console.log('filter', filter);
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <div>
+      filter by: <input value={filter} onChange={handleFilter}/>
+      </div>
       <form onSubmit={handleaddInfo}>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
@@ -93,12 +95,5 @@ const Person = ({person, number}) => {
     </div>
   )
 }
-
-// const Error = ({persons, newName}) => {
-//   if (persons.includes(newName))
-//     return (
-//     window.alert("Hello world!")
-//     )
-// }
 
 export default App
