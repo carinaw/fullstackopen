@@ -29,11 +29,32 @@ const App = () => {
 }
     const showFiltered = countries.filter(country => country.name.includes(filter));
 
-    const rows = () => showFiltered.map(country =>
-      <div>
-        <Country key={country.alpha2code} country={country}/>
-      </div>
-    )
+    const showCountries = () => {
+      if (showFiltered.length > 10) {
+      return (
+        <p>Too many matches, specify another filter</p>
+      )
+    } else if
+      (showFiltered.length > 1) {
+        return (
+    showFiltered.map(country =>
+        <div>
+          <Country key={country.alpha2code} country={country}/>
+        </div>
+      )) }
+
+      else if
+      (showFiltered.length === 1) {
+        return (
+        showFiltered.map(country =>
+        <div>
+          <h2>{country.name}</h2>
+        </div>
+        )
+      )
+      }
+    }
+
 
   return (
     <div>
@@ -43,10 +64,11 @@ const App = () => {
       </div>
     <div>
       Länderliste
-      {rows()}
+      {showCountries()}
     </div>
     </div>
   )
+
 }
 
 const Country = ({country}) => {
