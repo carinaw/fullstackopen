@@ -1,18 +1,26 @@
-import React from 'react';
-import './App.css';
-import { useState } from 'react';
+import React from 'react'
+import './App.css'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
 
 const App = ({person}) => {
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', number: '0452345401'},
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
-
+  const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
+
+const hook = () => {
+  console.log('effect')
+  axios
+  .get('http://localhost:3001/persons')
+  .then(response => {
+    console.log('promise fulfilled');
+    setPersons(response.data)
+  })
+}
+useEffect(hook, [])
+
+console.log('render', persons.length, 'persons')
 
 // Whatever changes within the input field - it is set as a newName at that point.
   const handleNameChange = (event) => {
@@ -54,7 +62,7 @@ const App = ({person}) => {
 
     const rows = () => showFiltered.map(person =>
       <div>
-        <Person key={person.name} person={person}/>
+        <Person key={person.id} person={person}/>
       </div>
     )
 
@@ -90,7 +98,7 @@ console.log('filter', filter);
 const Person = ({person, number}) => {
   return (
     <div>
-    <li>{person.name} {person.number}</li>
+    <li key={person.id}>{person.name} {person.number}</li>
 
     </div>
   )
