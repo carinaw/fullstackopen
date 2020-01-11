@@ -2,11 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
-
 const App = () => {
   const [ countries, setCountries ] = useState([])
   const [ filter, setFilter ] = useState('')
-
 
   const hook = () => {
     console.log('effect')
@@ -21,13 +19,13 @@ const App = () => {
 
   console.log('render', countries.length, 'countries')
 
-
-
-
+// Filter for the input field
     const handleFilter = (event) => {
       setFilter(event.target.value);
 }
     const showFiltered = countries.filter(country => country.name.includes(filter));
+
+// If logic to show country list and details.
 
     const showCountries = () => {
       if (showFiltered.length > 10) {
@@ -42,8 +40,6 @@ const App = () => {
           <Country key={country.alpha2code} country={country}/>
         </div>
       )) }
-
-
       else if
       (showFiltered.length === 1) {
         return (
@@ -59,15 +55,15 @@ const App = () => {
               <ul>
                 {country.languages.map(lang => <li>{lang.name}</li>)}
               </ul>
-        <div>
-          <img src={country.flag} height="100"/>
+            </div>
+              <div>
+                <img src={country.flag} alt="Country flag" height="100"/>
+              </div>
         </div>
-      </div>
-    </div>
         )
       )
-      }
     }
+  }
 
 
   return (
