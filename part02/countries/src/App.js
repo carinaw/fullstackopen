@@ -43,13 +43,27 @@ const App = () => {
         </div>
       )) }
 
+
       else if
       (showFiltered.length === 1) {
         return (
         showFiltered.map(country =>
         <div>
           <h2>{country.name}</h2>
+          <div>
+            <p>capital: {country.capital}</p>
+            <p>population: {country.population}</p>
+          </div>
+          <div>
+            <h3>languages</h3>
+              <ul>
+                {country.languages.map(lang => <li>{lang.name}</li>)}
+              </ul>
+        <div>
+          <img src={country.flag} height="100"/>
         </div>
+      </div>
+    </div>
         )
       )
       }
