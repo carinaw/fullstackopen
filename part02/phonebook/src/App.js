@@ -2,6 +2,7 @@ import React from 'react'
 import './App.css'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
+import personService from './services/persons'
 
 const App = ({person}) => {
   const [ persons, setPersons ] = useState([])
@@ -9,16 +10,14 @@ const App = ({person}) => {
   const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
 
-const hook = () => {
-  console.log('effect')
-  axios
-  .get('http://localhost:3001/persons')
-  .then(response => {
+useEffect(() => {
+  personService
+  .getAll()
+  .then(initialPersons => {
     console.log('promise fulfilled');
-    setPersons(response.data)
+    setPersons(initialPersons)
   })
-}
-useEffect(hook, [])
+}, [])
 
 console.log('render', persons.length, 'persons')
 
@@ -37,34 +36,36 @@ console.log('render', persons.length, 'persons')
     event.preventDefault()
 
   // Create an object called personObject where the value from the input field at time of submit click is stored.
-      const personObject = {
-        name: newName,
-        number: newNumber
-      };
+  const personObject = {
+      name: newName,
+      number: newNumber
+    }
+
+    personService
+      .create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
 
   // Use map for a reason I still need to comprehend and show alert if newName is already in the array.
-    const allNames = persons.map(person => person.name)
-     if (allNames.includes(newName, 0) === true) {
-     window.alert(`${newName} is already on the list!`) }
-     else {
-// Add the personObject object that was created when button was clicked to the array persons using concat.
-       setPersons(persons.concat(personObject));
-  // Clear newName state (and therefore field again)
-      setNewName('')
-      setNewNumber('')
-    };
-};
-
+    // const allNames = persons.map(person => person.name)
+    //  if (allNames.includes(newName, 0) === true) {
+    //  window.alert(`${newName} is already on the list!`) }
+}
     const handleFilter = (event) => {
       setFilter(event.target.value);
-}
-    const showFiltered = persons.filter(person => person.name.includes(filter));
+    }
+
+    const showFiltered = persons.filter(person =>
+      person.name.includes(filter));
 
     const rows = () => showFiltered.map(person =>
       <div>
         <Person key={person.id} person={person}/>
       </div>
-    )
+      )
 
 
 console.log('people', persons);
