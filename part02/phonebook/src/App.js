@@ -4,7 +4,6 @@ import axios from 'axios'
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
-
 const App = ({person}) => {
   const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
@@ -19,7 +18,6 @@ useEffect(() => {
     setPersons(initialPersons)
   })
 }, [])
-
 
 console.log('render', persons.length, 'persons')
 
