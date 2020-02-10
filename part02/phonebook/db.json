@@ -11,16 +11,6 @@
       "id": 2
     },
     {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": 3
-    },
-    {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-      "id": 4
-    },
-    {
       "name": "Carina",
       "number": "29484",
       "id": 5
@@ -34,6 +24,21 @@
       "name": "Niklas",
       "number": "04468282",
       "id": 7
+    },
+    {
+      "name": "Carina",
+      "number": "598683",
+      "id": 8
+    },
+    {
+      "name": "Carina",
+      "number": "",
+      "id": 9
+    },
+    {
+      "name": "Carla",
+      "number": "9357673",
+      "id": 10
     }
   ]
 }
