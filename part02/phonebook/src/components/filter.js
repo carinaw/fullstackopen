@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.css';
-import { useState } from 'react';
+import axios from 'axios'
+import { useState, useEffect } from 'react'
+import personService from './services/persons'
 
 const showFiltered = persons.filter(person => person.name.includes(filter));
 

@@ -19,8 +19,8 @@ useEffect(() => {
   })
 }, [])
 
-console.log('render', persons.length, 'persons')
 
+console.log('render', persons.length, 'persons')
 // Whatever changes within the input field - it is set as a newName at that point.
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -49,10 +49,6 @@ console.log('render', persons.length, 'persons')
         setNewNumber('')
       })
 
-  // Use map for a reason I still need to comprehend and show alert if newName is already in the array.
-    // const allNames = persons.map(person => person.name)
-    //  if (allNames.includes(newName, 0) === true) {
-    //  window.alert(`${newName} is already on the list!`) }
 }
     const handleFilter = (event) => {
       setFilter(event.target.value);
@@ -63,9 +59,20 @@ console.log('render', persons.length, 'persons')
 
     const rows = () => showFiltered.map(person =>
       <div>
-        <Person key={person.id} person={person}/>
+        <Person
+          key={person.id}
+          person={person}
+          handleDelete={() => handleDelete(person.id, person.name, person.number)}/>
       </div>
       )
+
+      const handleDelete = (id, newName, personObject) => {
+          if (window.confirm(`Do you really want to delete ${newName}?`))
+            {personService
+              .deleteContact(id)
+              .then(setPersons(persons.filter(person => person.id !== id)))
+            }
+}
 
 
 console.log('people', persons);
@@ -96,11 +103,12 @@ console.log('filter', filter);
   )
 }
 
-const Person = ({person, number}) => {
+const Person = ({person, number, handleDelete}) => {
   return (
     <div>
-    <li key={person.id}>{person.name} {person.number}</li>
-
+        <li key={person.id}>{person.name} {person.number}
+          <button onClick={handleDelete}>delete</button>
+        </li>
     </div>
   )
 }
