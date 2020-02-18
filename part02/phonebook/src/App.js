@@ -48,17 +48,25 @@ const App = ({ person }) => {
 
     const existingPerson = persons.find(person => person.name === newName);
 
-    if (existingPerson && window.confirm("Do you want to update?")) {
+    if (existingPerson && window.confirm(`Do you want to update ${newName}?`)) {
       personService
         .update(existingPerson.id, personObject)
-        .then(returnedPerson);
-      // Filter & create (use delete & create)
-    }
-    createPerson(personObject);
+        .then(returnedPerson => {
+          setPersons(
+            persons.filter(person => {
+              persons.includes(returnedPerson);
+            })
+          );
+          setPersons(persons.concat(returnedPerson));
+        });
+    } else createPerson(personObject);
   };
   const handleFilter = event => {
     setFilter(event.target.value);
   };
+
+  //heroes.filter(function(hero) {
+  //	return hero.franchise == “Marvel”;
 
   const showFiltered = persons.filter(person => person.name.includes(filter));
 
