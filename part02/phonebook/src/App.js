@@ -52,11 +52,7 @@ const App = ({ person }) => {
       personService
         .update(existingPerson.id, personObject)
         .then(returnedPerson => {
-          setPersons(
-            persons.filter(person => {
-              persons.includes(returnedPerson);
-            })
-          );
+          setPersons(persons.filter(person => person !== existingPerson));
           setPersons(persons.concat(returnedPerson));
         });
     } else createPerson(personObject);
