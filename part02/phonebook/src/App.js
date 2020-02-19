@@ -52,8 +52,11 @@ const App = ({ person }) => {
       personService
         .update(existingPerson.id, personObject)
         .then(returnedPerson => {
-          setPersons(persons.filter(person => person !== existingPerson));
-          setPersons(persons.concat(returnedPerson));
+          setPersons(
+            persons.map(person =>
+              person.id === existingPerson.id ? returnedPerson : person
+            )
+          );
         });
     } else createPerson(personObject);
   };
