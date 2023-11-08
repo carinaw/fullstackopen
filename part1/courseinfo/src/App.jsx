@@ -7,20 +7,24 @@ const Header = (props) => {
 };
 
 const Content = (props) => {
-  console.log(props);
+  // console.log(props.course.parts);
   return (
     <div>
-      <Part part={props.course.parts[0]} />
-      <Part part={props.course.parts[1]} />
-      <Part part={props.course.parts[2]} />
+      {props.course.parts.map((part) => {
+        console.log(part);
+        return (
+          <Part key={part.name} name={part.name} exercises={part.exercises} />
+        );
+      })}
     </div>
   );
 };
 
 const Part = (props) => {
+  // console.log(props);
   return (
     <p>
-      {props.part.name} {props.part.exercises}
+      {props.name} {props.exercises}
     </p>
   );
 };
