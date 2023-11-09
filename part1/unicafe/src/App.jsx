@@ -10,7 +10,7 @@ const Statistics = (props) => {
 				<StatisticsLine text="bad" statistic={props.bad} />
 				<StatisticsLine text="total" statistic={props.total} />
 				<StatisticsLine text="average" statistic={props.average} />
-				<StatisticsLine text="positive" statistic={props.positive} type="%" />
+				<StatisticsLine text="positive" statistic={props.positive} />
 			</div>
 		);
 	}
@@ -32,9 +32,7 @@ const StatisticsLine = (props) => {
 			<tbody>
 				<tr>
 					<td style={{ width: "60px" }}>{props.text}</td>
-					<td>
-						{props.statistic} {props.type}
-					</td>
+					<td>{props.statistic}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -66,7 +64,8 @@ const App = () => {
 	};
 
 	const average = (good - bad) / total;
-	const positive = (good / total) * 100;
+	const positive = (good / total) * 100 + "%";
+
 	return (
 		<>
 			<div>
