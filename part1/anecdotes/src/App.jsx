@@ -14,19 +14,19 @@ const App = () => {
 
 	const [selected, setSelected] = useState(0);
 
-	// random selection
-	const random = Math.random();
-	const totalArray = anecdotes.length;
-	const randomIndex = Math.floor(random * totalArray);
-	// console.log(randomIndex);
-
-	const votesArray = Array(totalArray).fill(0);
+	// create array to fill up for votes state
+	const votesArray = Array(anecdotes.length).fill(0);
 	console.log(votesArray);
+
 	const [votes, setVotes] = useState(votesArray);
 
-	//handlers;
+	// handlers
 	const handleRandomClick = () => {
+		const random = Math.random();
+		const totalArray = anecdotes.length;
+		const randomIndex = Math.floor(random * totalArray);
 		setSelected(randomIndex);
+		console.log("randomIndex", randomIndex);
 		console.log("selected", selected);
 	};
 
@@ -38,6 +38,7 @@ const App = () => {
 		console.log("votes", votes);
 	};
 
+	// find out which anecdote has max votes
 	const maxVotes = votes.indexOf(Math.max(...votes));
 	console.log("max votes", votes.indexOf(Math.max(...votes)));
 	console.log(anecdotes[maxVotes]);
