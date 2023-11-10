@@ -37,6 +37,11 @@ const App = () => {
 		console.log("newVotes", newVotes);
 		console.log("votes", votes);
 	};
+
+	const maxVotes = votes.indexOf(Math.max(...votes));
+	console.log("max votes", votes.indexOf(Math.max(...votes)));
+	console.log(anecdotes[maxVotes]);
+
 	return (
 		<div>
 			<h1>anecdote of the day</h1>
@@ -49,6 +54,8 @@ const App = () => {
 				</div>
 			</div>
 			<h1>best anecdote</h1>
+			<p>{anecdotes[maxVotes]}</p>
+			<p>It has {votes[maxVotes]} votes</p>
 		</div>
 	);
 };
