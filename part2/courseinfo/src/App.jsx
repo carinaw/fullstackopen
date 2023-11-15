@@ -16,13 +16,23 @@ const App = () => {
 			exercises: 14,
 			id: 3,
 		},
-		{ name: "Having a coffee", exercises: 3, id: 4 },
 	];
 
 	return (
 		<div>
 			<Course course={course} />
 			<Content parts={parts} />
+			<Sum parts={parts} />
+		</div>
+	);
+};
+
+const Sum = ({ parts }) => {
+	const total = parts.reduce((p, n) => p + n.exercises, 0);
+	console.log(total);
+	return (
+		<div>
+			<p>Total exercises: {total}</p>
 		</div>
 	);
 };
