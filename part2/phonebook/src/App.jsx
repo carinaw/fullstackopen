@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 import ContactList from "./components/ContactList";
 
 const App = () => {
-	const [persons, setPersons] = useState([
-		{ name: "Arto Hellas", number: "0448282" },
-		{ name: "Makani", number: "02593892" },
-		{ name: "Carina", number: "04591345" },
-		{ name: "Niklas", number: "0294892" },
-	]);
+	useEffect(() => {
+		console.log("what's happening");
+		axios.get("http://localhost:3001/persons").then((response) => {
+			console.log("show me");
+			setPersons(response.data);
+		});
+	}, []);
+
+	const [persons, setPersons] = useState([]);
 
 	const [newName, setNewName] = useState("");
 	const [newNumber, setNewNumber] = useState("");
@@ -72,14 +76,6 @@ const App = () => {
 			</div>
 			<ContactList filtered={filtered} />
 		</div>
-	);
-};
-
-const Contact = ({ filter }) => {
-	return (
-		<p key={filter.id}>
-			{filter.name} {filter.number}
-		</p>
 	);
 };
 
