@@ -1,8 +1,17 @@
-const Contact = ({ filter }) => {
+const Contact = ({ filter, handleDelete }) => {
 	return (
-		<p key={filter.id}>
-			{filter.name} {filter.number}
-		</p>
+		<div>
+			<p key={filter.id}>
+				{filter.name} {filter.number}{" "}
+				<button
+					onClick={() => {
+						handleDelete(filter.id);
+					}}
+				>
+					delete
+				</button>
+			</p>
+		</div>
 	);
 };
 

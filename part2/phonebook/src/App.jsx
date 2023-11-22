@@ -3,18 +3,18 @@ import axios from "axios";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 import ContactList from "./components/ContactList";
+import personService from "./services/phonebook";
 
 const App = () => {
 	useEffect(() => {
 		console.log("what's happening");
-		axios.get("http://localhost:3001/persons").then((response) => {
+		personService.getAll().then((response) => {
 			console.log("show me");
 			setPersons(response.data);
 		});
 	}, []);
 
 	const [persons, setPersons] = useState([]);
-
 	const [newName, setNewName] = useState("");
 	const [newNumber, setNewNumber] = useState("");
 	const [newFilter, setFiltered] = useState("");
@@ -27,9 +27,6 @@ const App = () => {
 			number: newNumber,
 			id: persons.length + 1,
 		};
-		setPersons(persons.concat(newPerson));
-		setNewName("");
-		setNewNumber("");
 
 		const isAlreadyAdded = persons.find((person) => person.name === newName);
 		console.log("is it there", isAlreadyAdded);
@@ -37,6 +34,13 @@ const App = () => {
 		if (isAlreadyAdded === undefined) {
 			console.log("is it there", isAlreadyAdded);
 		} else alert(`${newName} is already in the phonebook!`);
+
+		personService.create(newPerson).then((response) => {
+			console.log(response);
+			setPersons(persons.concat(response.data));
+			setNewName("");
+			setNewNumber("");
+		});
 	};
 
 	const handleNameAddition = (event) => {
@@ -58,8 +62,16 @@ const App = () => {
 				p.name.toLowerCase().includes(newFilter.toLowerCase())
 		  )
 		: persons;
+	console.log("filtered", filtered);
 
-	console.log(persons);
+	const handleDelete = (id) => {
+		console.log("now delete", id);
+
+		personService.deleteEntry(id).then(() => {
+			const newList = persons.filter((p) => p.id !== id);
+			setPersons(newList);
+		});
+	};
 
 	return (
 		<div>
@@ -74,7 +86,7 @@ const App = () => {
 					handleNumberAddition={handleNumberAddition}
 				/>
 			</div>
-			<ContactList filtered={filtered} />
+			<ContactList filtered={filtered} handleDelete={handleDelete} />
 		</div>
 	);
 };
