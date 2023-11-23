@@ -64,13 +64,16 @@ const App = () => {
 		: persons;
 	console.log("filtered", filtered);
 
+	// Delete entry
 	const handleDelete = (id) => {
 		console.log("now delete", id);
-
-		personService.deleteEntry(id).then(() => {
-			const newList = persons.filter((p) => p.id !== id);
-			setPersons(newList);
-		});
+		const deleteName = persons.find((person) => person.id === id);
+		if (confirm(`Do you really want to delete ${deleteName.name}?`)) {
+			personService.deleteEntry(id).then(() => {
+				const newList = persons.filter((p) => p.id !== id);
+				setPersons(newList);
+			});
+		}
 	};
 
 	return (
