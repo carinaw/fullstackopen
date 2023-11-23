@@ -1,13 +1,8 @@
 {
   "persons": [
     {
-      "name": "Carina",
-      "number": "0467",
-      "id": 0
-    },
-    {
       "name": "Makani",
-      "number": "048833",
+      "number": "0345666",
       "id": 1
     },
     {
@@ -34,6 +29,16 @@
       "name": "Mausi",
       "number": "035263",
       "id": 7
+    },
+    {
+      "name": "Juha",
+      "number": "303564",
+      "id": 8
+    },
+    {
+      "name": "Jana",
+      "number": "935366",
+      "id": 9
     }
   ]
 }
