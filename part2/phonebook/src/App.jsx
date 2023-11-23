@@ -22,27 +22,42 @@ const App = () => {
 	const addPerson = (event) => {
 		event.preventDefault();
 		console.log("button clicked", event.target);
-		const newPerson = {
-			name: newName,
-			number: newNumber,
-			id: persons.length + 1,
-		};
 
 		const isAlreadyAdded = persons.find((person) => person.name === newName);
-		console.log("is it there", isAlreadyAdded);
 
-		if (isAlreadyAdded === undefined) {
-			console.log("is it there", isAlreadyAdded);
-		} else alert(`${newName} is already in the phonebook!`);
+		console.log("is it there?", isAlreadyAdded);
 
-		personService.create(newPerson).then((response) => {
-			console.log(response);
-			setPersons(persons.concat(response.data));
-			setNewName("");
-			setNewNumber("");
-		});
+		if (isAlreadyAdded) {
+			confirm(
+				`${newName} is already in the phonebook! Do you want to update the number?`
+			);
+
+			console.log("now");
+
+			personService
+				.update(isAlreadyAdded.id, { ...isAlreadyAdded, number: newNumber })
+				.then((response) => {
+					console.log(response);
+					setPersons(
+						persons.map((person) =>
+							person.id !== isAlreadyAdded.id ? person : response.data
+						)
+					);
+				});
+		} else {
+			const newPerson = {
+				name: newName,
+				number: newNumber,
+				id: persons.length + 1,
+			};
+			personService.create(newPerson).then((response) => {
+				console.log(response);
+				setPersons(persons.concat(response.data));
+				setNewName("");
+				setNewNumber("");
+			});
+		}
 	};
-
 	const handleNameAddition = (event) => {
 		console.log(event.target.value);
 		setNewName(event.target.value);

@@ -2,13 +2,38 @@
   "persons": [
     {
       "name": "Carina",
-      "number": "03848",
+      "number": "0467",
       "id": 0
     },
     {
       "name": "Makani",
-      "number": "0284433",
+      "number": "048833",
+      "id": 1
+    },
+    {
+      "name": "Flauschi",
+      "number": "903945",
       "id": 2
+    },
+    {
+      "name": "Schnee",
+      "number": "923945",
+      "id": 3
+    },
+    {
+      "name": "Mai",
+      "number": "93636",
+      "id": 5
+    },
+    {
+      "name": "Alice",
+      "number": "034567",
+      "id": 6
+    },
+    {
+      "name": "Mausi",
+      "number": "035263",
+      "id": 7
     }
   ]
 }
