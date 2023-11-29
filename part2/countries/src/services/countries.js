@@ -1,5 +1,8 @@
 import axios from "axios";
+
 const baseURL = "https://studies.cs.helsinki.fi/restcountries/api";
+const apiKey = "e9b3651426e94730f5216df3e09406db";
+const weatherURL = "https://api.openweathermap.org/data/2.5/weather";
 
 const getAll = () => {
 	const request = axios.get(`${baseURL}/all`);
@@ -11,4 +14,11 @@ const getOne = (searchCountry) => {
 	return request.then((response) => response.data);
 };
 
-export default { getAll, getOne };
+const getWeather = (lat, lon) => {
+	const request = axios.get(
+		`${weatherURL}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+	);
+	return request.then((response) => response.data);
+};
+
+export default { getAll, getOne, getWeather };

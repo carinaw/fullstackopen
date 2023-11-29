@@ -7,6 +7,7 @@ const App = () => {
 	const [countries, setCountries] = useState([]);
 	const [searchCountry, setSearchCountries] = useState("");
 	const [countryInfo, setCountryInfo] = useState(null);
+	const [weatherData, setWeatherData] = useState(null);
 
 	useEffect(() => {
 		countryService.getAll().then((countryData) => {
@@ -35,12 +36,33 @@ const App = () => {
 					console.log("Not a full country name");
 				});
 		}
+		// Trigger render every time searchCountry has a value, which means we need error handling
 	}, [searchCountry]);
-	// trigger render every time searchCountry has a value, which means we need error handling
+
+	useEffect(() => {
+		if (countryInfo) {
+			countryService
+				.getWeather(
+					countryInfo.capitalInfo.latlng[0],
+					countryInfo.capitalInfo.latlng[1]
+				)
+				.then((weather) => {
+					setWeatherData(weather);
+					console.log(weatherData, "weather");
+				});
+		}
+	}, [countryInfo]);
 
 	const handleSearch = (event) => {
 		setSearchCountries(event.target.value);
 		console.log(event.target.value);
+	};
+
+	const handleCountryClick = (countryName) => {
+		console.log("log click");
+		countryService
+			.getOne(countryName)
+			.then((country) => setCountryInfo(country));
 	};
 
 	const filteredCountries = searchCountry
@@ -48,6 +70,8 @@ const App = () => {
 				country.toLowerCase().includes(searchCountry.toLowerCase())
 		  )
 		: [countries];
+
+	const weatherIconURL = "https://openweathermap.org/img/wn";
 
 	return (
 		<>
@@ -61,13 +85,22 @@ const App = () => {
 				{filteredCountries.length <= 10 && filteredCountries.length > 1 && (
 					<ul>
 						{filteredCountries.map((country) => (
-							<li key={country}>{country}</li>
+							<li key={country}>
+								{country}{" "}
+								<button
+									onClick={() => {
+										handleCountryClick(country);
+									}}
+								>
+									Details
+								</button>
+							</li>
 						))}
 					</ul>
 				)}
 				{countryInfo && (
 					<div>
-						<h2>Name: {countryInfo.name.common}</h2>
+						<h2>{countryInfo.name.common}</h2>
 						<p>Capital: {countryInfo.capital[0]}</p>
 						<p>Area: {countryInfo.area} km2</p>
 						<img src={countryInfo.flags.png} alt={`Flag of country`} />
@@ -77,6 +110,18 @@ const App = () => {
 								<li key={language}>{language}</li>
 							))}
 						</ul>{" "}
+					</div>
+				)}
+
+				{weatherData && (
+					<div>
+						<h2>Weather in {countryInfo.name.common}:</h2>
+						<p>Temperature: {weatherData.main.temp.toFixed(1)} Celsius</p>
+						<img
+							src={`${weatherIconURL}/${weatherData.weather[0].icon}@2x.png`}
+							alt={"Weather icon"}
+						/>
+						<p>Wind: {weatherData.wind.speed} m/s</p>
 					</div>
 				)}
 			</div>
