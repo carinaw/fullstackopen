@@ -102,6 +102,15 @@ describe("missing properties", () => {
 
 		await api.post("/api/blogs").send(blogPost).expect(400);
 	});
+	test("missing url property returns 400 bad request", async () => {
+		const blogPost = new Blog({
+			title: "Grooming for beginners",
+			author: "Flausch",
+			likes: 5,
+		});
+
+		await api.post("/api/blogs").send(blogPost).expect(400);
+	});
 });
 
 afterAll(async () => {
