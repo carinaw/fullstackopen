@@ -1,0 +1,17 @@
+GET http://localhost:3001
+
+###
+GET http://localhost:3001/api/blogs
+
+###
+POST http://localhost:3001/api/blogs
+CONTENT-Type: application/json
+
+{ "title": "WOLVES",
+"author": "CA",
+"url": "wolves",
+"likes": "4" 
+}
+
+###
+DELETE http://localhost:3001/657485dac14bdc6848c9f3e0
