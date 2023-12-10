@@ -4,14 +4,27 @@ GET http://localhost:3001
 GET http://localhost:3001/api/blogs
 
 ###
+GET http://localhost:3001/api/blogs/65758a5351784968b521fb13
+
+###
 POST http://localhost:3001/api/blogs
 CONTENT-Type: application/json
 
-{ "title": "WOLVES",
-"author": "CA",
-"url": "wolves",
-"likes": "4" 
+{ "title": "Nosework basics",
+"author": "NT",
+"url": "smells-everywhere",
+"likes": "9" 
 }
 
 ###
-DELETE http://localhost:3001/657485dac14bdc6848c9f3e0
+DELETE http://localhost:3001/api/blogs/6575f0387df6be9d91cd9932
+
+###
+PUT http://localhost:3001/api/blogs/6575fcc479200d024976029d
+CONTENT-Type: application/json
+
+{ "title": "Exercise requirements",
+"author": "PK",
+"url": "go-outside",
+"likes": "9" 
+}

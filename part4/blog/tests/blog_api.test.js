@@ -110,6 +110,24 @@ describe("missing properties", () => {
 		});
 
 		await api.post("/api/blogs").send(blogPost).expect(400);
+	}, 50000);
+});
+
+describe("deleting posts", () => {
+	test("check if deleting a post works", async () => {
+		const initialPosts = await api.get("/api/blogs");
+		const postsBeforeDelete = initialPosts.body;
+		const blogToDelete = postsBeforeDelete[0];
+
+		console.log("id of blog to delete", blogToDelete.id);
+
+		await api.delete(`/api/blogs/${blogToDelete.id}`);
+
+		const finalPosts = await api.get("/api/blogs");
+		console.log("posts after delete", finalPosts.body);
+		const postsAfterDelete = finalPosts.body;
+
+		expect(postsAfterDelete).toHaveLength(postsBeforeDelete.length - 1);
 	});
 });
 
