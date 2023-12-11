@@ -8,13 +8,17 @@ GET http://localhost:3001/api/blogs/65758a5351784968b521fb13
 POST http://localhost:3001/api/users/
 CONTENT-Type: application/json
 
-{ "name": "Ha",
-"username": "Flausch",
-"password": "Hasi"
+{ "name": "Mr",
+"username": "snowman",
+"password": "lumi"
 }
 
 ###
 DELETE http://localhost:3001/api/blogs/6575f0387df6be9d91cd9932
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNub3dtYW4iLCJpZCI6IjY1NzcyODA4NGZmZjZlMWIyZWVlNDhkYiIsImlhdCI6MTcwMjMwOTUzNX0._ao0nByN9xZVib61zflrmrmUOa3Q5amjkuFQq-Hl6ZU
+
+
 
 ###
 PUT http://localhost:3001/api/blogs/6575fcc479200d024976029d
