@@ -1,0 +1,25 @@
+###
+GET http://localhost:3001/api/users
+
+###
+GET http://localhost:3001/api/blogs/65758a5351784968b521fb13
+
+###
+POST http://localhost:3001/api/users/
+CONTENT-Type: application/json
+
+{ "name": "Ha",
+"username": "Flausch",
+"password": "Hasi"
+}
+
+###
+DELETE http://localhost:3001/api/blogs/6575f0387df6be9d91cd9932
+
+###
+PUT http://localhost:3001/api/blogs/6575fcc479200d024976029d
+CONTENT-Type: application/json
+
+{ 
+"likes": "23" 
+}

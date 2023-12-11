@@ -9,11 +9,12 @@ GET http://localhost:3001/api/blogs/65758a5351784968b521fb13
 ###
 POST http://localhost:3001/api/blogs
 CONTENT-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkZsYXVzY2giLCJpZCI6IjY1NzZjOTlkODMxODQyMDYyM2E1Yzg5ZSIsImlhdCI6MTcwMjI4OTg3NH0.JRJ8BE29z0ROhOuFuICNavOkN2I6EahT7lO2CzmRSAU
 
-{ "title": "Nosework basics",
-"author": "NT",
-"url": "smells-everywhere",
-"likes": "9" 
+{ "title": "Harrastuskoirakurssi",
+"author": "MT",
+"url": "finnish-and-english",
+"likes": "4"
 }
 
 ###
@@ -23,8 +24,6 @@ DELETE http://localhost:3001/api/blogs/6575f0387df6be9d91cd9932
 PUT http://localhost:3001/api/blogs/6575fcc479200d024976029d
 CONTENT-Type: application/json
 
-{ "title": "Exercise requirements",
-"author": "PK",
-"url": "go-outside",
-"likes": "9" 
+{ 
+"likes": "23" 
 }

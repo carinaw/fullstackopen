@@ -102,6 +102,7 @@ describe("missing properties", () => {
 
 		await api.post("/api/blogs").send(blogPost).expect(400);
 	});
+
 	test("missing url property returns 400 bad request", async () => {
 		const blogPost = new Blog({
 			title: "Grooming for beginners",
