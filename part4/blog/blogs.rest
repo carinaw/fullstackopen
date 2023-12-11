@@ -9,12 +9,12 @@ GET http://localhost:3001/api/blogs/65758a5351784968b521fb13
 ###
 POST http://localhost:3001/api/blogs
 CONTENT-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkZsYXVzY2giLCJpZCI6IjY1NzZjOTlkODMxODQyMDYyM2E1Yzg5ZSIsImlhdCI6MTcwMjI4OTg3NH0.JRJ8BE29z0ROhOuFuICNavOkN2I6EahT7lO2CzmRSAU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pa3UiLCJpZCI6IjY1NzczNThlMDcxMDRkM2M1NWY2MTJiMyIsImlhdCI6MTcwMjMxMTM1MH0.ebaq2o_0EuzimX2ZXW2O8K8Fhk76Q4xFNbGv47973s0
 
-{ "title": "Harrastuskoirakurssi",
-"author": "MT",
-"url": "finnish-and-english",
-"likes": "4"
+{ "title": "Training reactivity",
+"author": "MM",
+"url": "leash-walking",
+"likes": "8"
 }
 
 ###
