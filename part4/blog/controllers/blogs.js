@@ -59,16 +59,19 @@ blogsRouter.delete("/:id", async (request, response) => {
 	if (!blogToDelete) {
 		return response.status(404).json({ error: "blog post not found" });
 	}
-
-	if (blogToDelete.user.toString() === decodedToken.id) {
-		await Blog.findByIdAndRemove(request.params.id);
-		response.status(204).end();
-	}
-
-	if (blogToDelete.user.toString() !== decodedToken.id) {
+	if (!blogToDelete.user) {
 		return response
 			.status(404)
-			.json({ error: "this user is not authorized to delete the blog post" });
+			.json({ error: "user not associated with the blog post" });
+	}
+	console.log("who is the user", blogToDelete.user);
+	if (blogToDelete.user && blogToDelete.user.toString() === decodedToken.id) {
+		await Blog.findByIdAndRemove(request.params.id);
+		response.status(204).end();
+	} else {
+		response
+			.status(403)
+			.json({ error: "Unauthorized to delete this blog post" });
 	}
 });
 

@@ -32,24 +32,22 @@ const initialPosts = [
 let token;
 
 beforeEach(async () => {
-	await User.deleteMany({});
-	const passwordHash = await bcrypt.hash("sekret", 10);
-	const testUser = new User({ username: "root", passwordHash });
-	await testUser.save();
-
-	const userForToken = {
-		username: testUser.username,
-		id: testUser._id,
-	};
-	token = jwt.sign(userForToken, process.env.SECRET);
-
 	await Blog.deleteMany({});
-	let blogObject = new Blog(initialPosts[0]);
-	await blogObject.save();
-	blogObject = new Blog(initialPosts[1]);
-	await blogObject.save();
-	blogObject = new Blog(initialPosts[2]);
-	await blogObject.save();
+	await User.deleteMany({});
+
+	const passwordHash = await bcrypt.hash("sekret", 10);
+	const user = new User({ username: "root", passwordHash });
+	await user.save();
+
+	const fullBlogPosts = initialPosts.map(
+		(post) => new Blog({ ...post, user: user._id })
+	);
+	await Promise.all(fullBlogPosts.map((blog) => blog.save()));
+
+	token = jwt.sign(
+		{ username: user.username, id: user._id },
+		process.env.SECRET
+	);
 });
 
 describe("blog posts exist correctly", () => {
@@ -85,11 +83,11 @@ describe("format is correct", () => {
 			title: "Dogs",
 			author: "Carina",
 			url: "life-with-dogs",
-			user: "94959679800000",
 		});
 
 		await blogPost.save();
 		console.log("zero likes blog post", blogPost);
+
 		expect(blogPost.likes).toBe(0);
 	});
 });
@@ -123,23 +121,31 @@ describe("posting works", () => {
 
 describe("missing properties", () => {
 	test("missing title property returns 400 bad request", async () => {
-		const blogPost = new Blog({
+		const blogPost = {
 			author: "Flausch",
 			url: "here-would-be-url",
 			likes: 5,
-		});
+		};
 		console.log("the post to test with", blogPost);
-		await api.post("/api/blogs").send(blogPost).expect(400);
+		await api
+			.post("/api/blogs")
+			.send(blogPost)
+			.set("Authorization", `Bearer ${token}`)
+			.expect(400);
 	});
 
 	test("missing url property returns 400 bad request", async () => {
-		const blogPost = new Blog({
+		const blogPost = {
 			title: "Grooming for beginners",
 			author: "Flausch",
 			likes: 5,
-		});
+		};
 
-		await api.post("/api/blogs").send(blogPost).expect(400);
+		await api
+			.post("/api/blogs")
+			.send(blogPost)
+			.set("Authorization", `Bearer ${token}`)
+			.expect(400);
 	}, 50000);
 });
 
@@ -154,11 +160,13 @@ describe("deleting posts", () => {
 		const blogToDelete = postsBeforeDelete[0];
 
 		console.log("id of blog to delete", blogToDelete.id);
-
-		await api.delete(`/api/blogs/${blogToDelete.id}`);
+		console.log("blog to delete user", blogToDelete.user);
+		await api
+			.delete(`/api/blogs/${blogToDelete.id}`)
+			.set("Authorization", `Bearer ${token}`);
 
 		const finalPosts = await api.get("/api/blogs");
-		// console.log("posts after delete", finalPosts.body);
+		console.log("posts after delete", finalPosts.body);
 		const postsAfterDelete = finalPosts.body;
 
 		expect(postsAfterDelete).toHaveLength(postsBeforeDelete.length - 1);
