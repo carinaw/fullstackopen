@@ -2,7 +2,6 @@ const middleware = require("../utils/middleware");
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
-const { MongoUnexpectedServerResponseError } = require("mongodb");
 const jwt = require("jsonwebtoken");
 
 blogsRouter.get("/", async (request, response) => {
@@ -17,10 +16,15 @@ blogsRouter.get("/:id", async (request, response) => {
 	response.json(specificBlog);
 });
 
-blogsRouter.post("/", async (request, response) => {
+blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 	const body = request.body;
-
+	console.log("log the body", request.body);
 	const user = request.user;
+
+	if (!request.user) {
+		return response.status(401).json({ error: "User not authenticated" });
+	}
+
 	console.log("user id", user);
 
 	const blog = new Blog({

@@ -3,6 +3,10 @@ const supertest = require("supertest");
 const app = require("../app");
 const api = supertest(app);
 const Blog = require("../models/blog");
+const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { LEGAL_TLS_SOCKET_OPTIONS } = require("mongodb");
 
 const initialPosts = [
 	{
@@ -25,7 +29,20 @@ const initialPosts = [
 	},
 ];
 
+let token;
+
 beforeEach(async () => {
+	await User.deleteMany({});
+	const passwordHash = await bcrypt.hash("sekret", 10);
+	const testUser = new User({ username: "root", passwordHash });
+	await testUser.save();
+
+	const userForToken = {
+		username: testUser.username,
+		id: testUser._id,
+	};
+	token = jwt.sign(userForToken, process.env.SECRET);
+
 	await Blog.deleteMany({});
 	let blogObject = new Blog(initialPosts[0]);
 	await blogObject.save();
@@ -68,6 +85,7 @@ describe("format is correct", () => {
 			title: "Dogs",
 			author: "Carina",
 			url: "life-with-dogs",
+			user: "94959679800000",
 		});
 
 		await blogPost.save();
@@ -78,18 +96,29 @@ describe("format is correct", () => {
 
 describe("posting works", () => {
 	test("http post request creates blog post", async () => {
-		const blogPost = new Blog({
+		const blogPost = {
 			title: "Dogs",
 			author: "Carina",
 			url: "life-with-dogs",
 			likes: "5",
-		});
+			user: "",
+		};
+		console.log(blogPost, "request body");
+		const response = await api
+			.post("/api/blogs")
+			.send(blogPost)
+			.set("Authorization", `Bearer ${token}`);
 
-		await blogPost.save();
+		if (response.status !== 201) {
+			console.log(response.body);
+		}
+
+		expect(response.status).toBe(201);
+
 		const newPosts = await api.get("/api/blogs");
 
 		expect(newPosts.body).toHaveLength(initialPosts.length + 1);
-	});
+	}, 10000);
 });
 
 describe("missing properties", () => {
@@ -99,7 +128,7 @@ describe("missing properties", () => {
 			url: "here-would-be-url",
 			likes: 5,
 		});
-
+		console.log("the post to test with", blogPost);
 		await api.post("/api/blogs").send(blogPost).expect(400);
 	});
 
@@ -114,6 +143,10 @@ describe("missing properties", () => {
 	}, 50000);
 });
 
+describe("token tests", () => {
+	test("blog fails with 401 unauthorized if no token is provided", async () => {}, 10000);
+});
+
 describe("deleting posts", () => {
 	test("check if deleting a post works", async () => {
 		const initialPosts = await api.get("/api/blogs");
@@ -125,7 +158,7 @@ describe("deleting posts", () => {
 		await api.delete(`/api/blogs/${blogToDelete.id}`);
 
 		const finalPosts = await api.get("/api/blogs");
-		console.log("posts after delete", finalPosts.body);
+		// console.log("posts after delete", finalPosts.body);
 		const postsAfterDelete = finalPosts.body;
 
 		expect(postsAfterDelete).toHaveLength(postsBeforeDelete.length - 1);

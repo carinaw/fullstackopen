@@ -24,6 +24,9 @@ const errorHandler = (error, request, response, next) => {
 		return response.status(400).json({ error: error.message });
 	} else if (error.name === "JsonWebTokenError") {
 		return response.status(401).json({ error: error.message });
+	} else {
+		logger.error("Undefined error received in errorHandler");
+		return response.status(500).json({ error: "Internal Server Error" });
 	}
 
 	next(error);
@@ -47,10 +50,12 @@ const userExtractor = async (request, response, next) => {
 	}
 	try {
 		const decodedToken = jwt.verify(request.token, process.env.SECRET);
+		console.log("decodedToken", decodedToken);
 		if (!decodedToken.id) {
 			return response.status(401).json({ error: "token invalid" });
 		}
 		const user = await User.findById(decodedToken.id);
+		console.log("is a user found?", user);
 		if (user) {
 			request.user = user;
 			next();

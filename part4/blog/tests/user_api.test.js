@@ -10,7 +10,7 @@ describe("requests work", () => {
 		await User.deleteMany({});
 
 		const passwordHash = await bcrypt.hash("sekret", 10);
-		const user = new User({ username: "root", passwordHash });
+		const testUser = new User({ username: "root", passwordHash });
 
 		await user.save();
 	});
