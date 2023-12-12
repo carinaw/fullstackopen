@@ -12,7 +12,7 @@ describe("requests work", () => {
 		const passwordHash = await bcrypt.hash("sekret", 10);
 		const testUser = new User({ username: "root", passwordHash });
 
-		await user.save();
+		await testUser.save();
 	});
 
 	test("all users can be found", async () => {
