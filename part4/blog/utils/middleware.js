@@ -48,22 +48,19 @@ const userExtractor = async (request, response, next) => {
 	if (!request.token) {
 		return next();
 	}
-	try {
-		const decodedToken = jwt.verify(request.token, process.env.SECRET);
-		console.log("decodedToken", decodedToken);
-		if (!decodedToken.id) {
-			return response.status(401).json({ error: "token invalid" });
-		}
-		const user = await User.findById(decodedToken.id);
-		console.log("is a user found?", user);
-		if (user) {
-			request.user = user;
-			next();
-		} else {
-			response.status(404).json({ error: "user not found" });
-		}
-	} catch (error) {
-		next(error);
+
+	const decodedToken = jwt.verify(request.token, process.env.SECRET);
+	console.log("decodedToken", decodedToken);
+	if (!decodedToken.id) {
+		return response.status(401).json({ error: "token invalid" });
+	}
+	const user = await User.findById(decodedToken.id);
+	console.log("is a user found?", user);
+	if (user) {
+		request.user = user;
+		next();
+	} else {
+		response.status(404).json({ error: "user not found" });
 	}
 };
 

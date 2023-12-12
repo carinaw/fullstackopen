@@ -25,26 +25,24 @@ usersRouter.post("/", async (request, response) => {
 	const saltRounds = 10;
 	const passwordHash = await bcrypt.hash(password, saltRounds);
 
-	try {
-		const user = new User({
-			username,
-			name,
-			passwordHash,
-		});
+	const user = new User({
+		username,
+		name,
+		passwordHash,
+	});
 
-		const savedUser = await user.save();
-		response.status(201).json(savedUser);
-	} catch (error) {
-		const uniqueUser = async (username) => {
-			const existingUser = await User.findOne({ username });
-			return !existingUser;
-		};
-		const unique = await uniqueUser(username);
-		if (!unique) {
-			return response
-				.status(400)
-				.json({ error: "This username already exists." });
-		}
+	const savedUser = await user.save();
+	response.status(201).json(savedUser);
+
+	const uniqueUser = async (username) => {
+		const existingUser = await User.findOne({ username });
+		return !existingUser;
+	};
+	const unique = await uniqueUser(username);
+	if (!unique) {
+		return response
+			.status(400)
+			.json({ error: "This username already exists." });
 	}
 });
 
