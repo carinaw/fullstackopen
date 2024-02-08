@@ -29,6 +29,12 @@ const App = () => {
 		}
 	};
 
+	const handleLogout = () => {
+		window.localStorage.removeItem("loggedBlogappUser");
+		window.localStorage.clear();
+		window.location.reload();
+	};
+
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
 	}, []);
@@ -75,6 +81,7 @@ const App = () => {
 		<div>
 			<p>
 				{user.name} {user.username} is logged in.{" "}
+				<button onClick={handleLogout}>logout</button>
 			</p>
 			<h2>blogs</h2>
 			{blogs.map((blog) => (
