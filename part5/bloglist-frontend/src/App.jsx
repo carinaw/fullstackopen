@@ -2,6 +2,18 @@ import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import "./index.css";
+
+const Notification = ({ successMessage, errorMessage }) => {
+	if (!successMessage && !errorMessage) {
+		return null;
+	}
+	return (
+		<div className={`${successMessage ? "success" : "error"}`}>
+			{successMessage ? successMessage : errorMessage}
+		</div>
+	);
+};
 
 const App = () => {
 	const [blogs, setBlogs] = useState([]);
@@ -12,6 +24,8 @@ const App = () => {
 	const [author, setAuthor] = useState("");
 	const [url, setUrl] = useState("");
 	const [post, setPost] = useState(null);
+	const [errorMessage, setErrorMessage] = useState(null);
+	const [successMessage, setSuccessMessage] = useState(null);
 
 	const handleLogin = async (event) => {
 		event.preventDefault();
@@ -29,7 +43,11 @@ const App = () => {
 			setUsername("");
 			setPassword("");
 		} catch (exception) {
-			console.log(exception);
+			console.log(exception, "something went wrong");
+			setErrorMessage(`Wrong username or password. Please try again.`);
+			setTimeout(() => {
+				setErrorMessage(null);
+			}, 2000);
 		}
 	};
 
@@ -50,8 +68,19 @@ const App = () => {
 				url,
 			});
 			setPost(post);
+			setAuthor("");
+			setTitle("");
+			setUrl("");
+			setSuccessMessage(`A new blog post named ${post.title} has been added.`);
+			setTimeout(() => {
+				setSuccessMessage(null);
+			}, 5000);
 		} catch (exception) {
 			console.log(exception);
+			setErrormessage(`Something went wrong.`);
+			setTimeout(() => {
+				setErrorMessage(null);
+			}, 2000);
 		}
 	};
 
@@ -72,6 +101,10 @@ const App = () => {
 		return (
 			<div>
 				<h2>Please log in to the application.</h2>
+				<Notification
+					errorMessage={errorMessage}
+					successMessage={successMessage}
+				/>
 				<form onSubmit={handleLogin}>
 					<div>
 						username
@@ -99,6 +132,11 @@ const App = () => {
 
 	return (
 		<div>
+			<h2>blog posts</h2>
+			<Notification
+				errorMessage={errorMessage}
+				successMessage={successMessage}
+			/>
 			<p>
 				{user.name} {user.username} is logged in.{" "}
 				<button onClick={handleLogout}>logout</button>
@@ -134,7 +172,7 @@ const App = () => {
 				</div>
 				<button type="submit">create</button>
 			</form>
-			<h2>blogs</h2>
+			<h2>view all</h2>
 			{blogs.map((blog) => (
 				<Blog key={blog.id} blog={blog} />
 			))}
