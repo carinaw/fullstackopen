@@ -44,7 +44,7 @@ const App = () => {
 			setPassword("");
 		} catch (exception) {
 			console.log(exception, "something went wrong");
-			setErrorMessage(`Wrong username or password. Please try again.`);
+			setErrorMessage("Wrong username or password. Please try again.");
 			setTimeout(() => {
 				setErrorMessage(null);
 			}, 2000);
