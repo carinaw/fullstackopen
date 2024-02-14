@@ -25,14 +25,14 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 		return response.status(401).json({ error: "User not authenticated" });
 	}
 
-	console.log("user id", user);
+	console.log("user", user);
 
 	const blog = new Blog({
 		title: body.title,
 		author: body.author,
 		url: body.url,
 		likes: body.likes,
-		user: user.id,
+		user: user._id,
 	});
 
 	if (!blog.title || !blog.url) {

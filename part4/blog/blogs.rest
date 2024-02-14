@@ -9,16 +9,16 @@ GET http://localhost:3001/api/blogs/65758a5351784968b521fb13
 ###
 POST http://localhost:3001/api/blogs
 CONTENT-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pa3UiLCJpZCI6IjY1NzczNThlMDcxMDRkM2M1NWY2MTJiMyIsImlhdCI6MTcwMjMxMTM1MH0.ebaq2o_0EuzimX2ZXW2O8K8Fhk76Q4xFNbGv47973s0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFuZ2VsIiwiaWQiOiI2NTc4MmQxMTU3YWQ0MjZiZWE1ZWE0OGUiLCJpYXQiOjE3MDIzNzQ2ODh9.k-kfU6dn6BCR83bZY8_DTLmOj-TBJ6PbqqDSpkhUOZU
 
-{ "title": "Training reactivity",
-"author": "MM",
-"url": "leash-walking",
-"likes": "8"
+{ "title": "Safe Christmas treats",
+"author": "CJ",
+"url": "kinkku-for-everyone",
+"likes": "3"
 }
 
 ###
-DELETE http://localhost:3001/api/blogs/6575f0387df6be9d91cd9932
+DELETE http://localhost:3001/api/blogs/65c9e2a7e0f57c6f141f25b5
 
 ###
 PUT http://localhost:3001/api/blogs/6575fcc479200d024976029d

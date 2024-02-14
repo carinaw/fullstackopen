@@ -66,6 +66,8 @@ const App = () => {
 		window.location.reload();
 	};
 
+	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
 	}, []);
@@ -118,8 +120,8 @@ const App = () => {
 				</ToggleVisibility>
 			</div>
 			<h2>view all</h2>
-			{blogs.map((blog) => (
-				<Blog key={blog.id} blog={blog} />
+			{sortedBlogs.map((blog) => (
+				<Blog key={blog.id} blog={blog} user={user} />
 			))}
 		</div>
 	);
