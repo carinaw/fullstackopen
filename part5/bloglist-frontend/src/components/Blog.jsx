@@ -2,7 +2,7 @@ import ToggleVisibility from "./ToggleVisibility";
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, user }) => {
+const Blog = ({ blog, user, handleDelete }) => {
 	const [likes, setLikes] = useState(blog.likes);
 
 	const blogPostStyle = {
@@ -26,15 +26,6 @@ const Blog = ({ blog, user }) => {
 		}
 	};
 
-	const handleDelete = async (event) => {
-		event.preventDefault();
-		try {
-			const deleteBlog = await blogService.deletePost(blog.id);
-		} catch (exception) {
-			console.log("can't delete,", exception);
-		}
-	};
-
 	return (
 		<div style={blogPostStyle}>
 			<div>
@@ -48,7 +39,9 @@ const Blog = ({ blog, user }) => {
 				</p>
 				<p>{user.name}</p>
 				<p>
-					<button onClick={handleDelete}>delete</button>
+					{blog.user && user.username === blog.user.username && (
+						<button onClick={handleDelete}>delete</button>
+					)}
 				</p>
 			</ToggleVisibility>
 		</div>
