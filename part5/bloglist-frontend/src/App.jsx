@@ -68,6 +68,19 @@ const App = () => {
 
 	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
+	const handleLikes = async (id) => {
+		try {
+			const likedBlog = blogs.find((blog) => blog.id === id);
+			const updatedBlog = await blogService.update(id, {
+				...likedBlog,
+				likes: likedBlog.likes + 1,
+			});
+			setBlogs(blogs.map((blog) => (blog.id === id ? updatedBlog : blog)));
+		} catch (exception) {
+			console.log("error updating likes", exception);
+		}
+	};
+
 	const handleDelete = async (id, blog) => {
 		try {
 			const deleteBlog = blogs.find((blog) => blog.id === id);
@@ -142,6 +155,7 @@ const App = () => {
 					blog={blog}
 					user={user}
 					handleDelete={() => handleDelete(blog.id)}
+					handleLikes={() => handleLikes(blog.id)}
 				/>
 			))}
 		</div>
