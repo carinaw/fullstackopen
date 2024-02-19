@@ -9,8 +9,8 @@ const ToggleVisibility = ({ children, setHiddenLabel, setVisibleLabel }) => {
 
 	return (
 		<div className="toggleIt">
-			{visible && children}
-			<button onClick={toggle}>
+			<span>{visible && children}</span>
+			<button onClick={toggle} id="show-details">
 				{" "}
 				{visible ? setHiddenLabel : setVisibleLabel}
 			</button>

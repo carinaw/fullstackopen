@@ -149,15 +149,18 @@ const App = () => {
 				</ToggleVisibility>
 			</div>
 			<h2>view all</h2>
-			{sortedBlogs.map((blog) => (
-				<Blog
-					key={blog.id}
-					blog={blog}
-					user={user}
-					handleDelete={() => handleDelete(blog.id)}
-					handleLikes={() => handleLikes(blog.id)}
-				/>
-			))}
+			<div className="blog-list">
+				{sortedBlogs.map((blog) => (
+					<Blog
+						key={blog.id}
+						blog={blog}
+						user={user}
+						handleDelete={() => handleDelete(blog.id)}
+						handleLikes={() => handleLikes(blog.id)}
+						className="blog"
+					/>
+				))}
+			</div>
 		</div>
 	);
 };

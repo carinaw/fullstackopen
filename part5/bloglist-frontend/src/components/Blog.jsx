@@ -12,7 +12,7 @@ const Blog = ({ blog, user, handleDelete, handleLikes }) => {
 	};
 
 	return (
-		<div style={blogPostStyle}>
+		<div style={blogPostStyle} className="a-blog">
 			<div className="short">
 				<p>{blog.title}</p>
 				<p>{blog.author}</p>
@@ -22,12 +22,16 @@ const Blog = ({ blog, user, handleDelete, handleLikes }) => {
 					<p>{blog.url}</p>{" "}
 					<p className="blog-likes">
 						likes: {blog.likes}{" "}
-						<button onClick={handleLikes}>like this post</button>
+						<button onClick={handleLikes} className="like-button">
+							like this post
+						</button>
 					</p>
 					<p>{user.name}</p>
 					<p>
 						{blog.user && user.username === blog.user.username && (
-							<button onClick={handleDelete}>delete</button>
+							<button onClick={handleDelete} id="delete-button">
+								delete
+							</button>
 						)}
 					</p>
 				</div>
