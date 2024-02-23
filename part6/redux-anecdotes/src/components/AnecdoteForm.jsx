@@ -4,16 +4,20 @@ import {
 	hideNotification,
 	showNotification,
 } from "../reducers/notificationReducer";
+import anecdoteService from "../services/anecdotes";
 
 const AnecdoteForm = () => {
 	const dispatch = useDispatch();
 
-	const addAnecdote = (event) => {
+	const addAnecdote = async (event) => {
 		event.preventDefault();
 		const content = event.target.anecdote.value;
 		event.target.anecdote.value = "";
-		dispatch(createA(content));
-		dispatch(showNotification(`You create the new note "${content}"`));
+		const newAnecdote = await anecdoteService.create(content);
+		// Await before dispatching, to make sure the note exists before trying to update the state with it.
+		dispatch(createA(newAnecdote));
+		console.log(content, "content!");
+		dispatch(showNotification(`You created the new note "${content}"`));
 		setTimeout(() => {
 			dispatch(hideNotification());
 		}, 5000);
