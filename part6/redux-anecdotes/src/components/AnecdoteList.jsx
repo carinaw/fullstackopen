@@ -1,9 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { voteThisA } from "../reducers/anecdoteReducer";
-import {
-	showNotification,
-	hideNotification,
-} from "../reducers/notificationReducer";
+import { vote } from "../reducers/anecdoteReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
 const Anecdote = ({ anecdote, handleVote }) => {
 	console.log(anecdote, "passed anecdote");
@@ -32,16 +29,13 @@ const AnecdoteList = () => {
 
 	const handleVote = (id, content) => {
 		event.preventDefault();
-		dispatch(voteThisA({ id }));
-
-		const notification = `You voted for "${content}"`;
-		dispatch(showNotification(notification));
-		setTimeout(() => {
-			dispatch(hideNotification());
-		}, 5000);
+		dispatch(vote(id));
+		dispatch(setNotification(`You voted for '${content}'`, 10));
 	};
 
 	const sortedByVotes = [...anecdotes].sort((a, b) => b.votes - a.votes);
+
+	console.log("this is my array check", sortedByVotes);
 
 	return (
 		<div>

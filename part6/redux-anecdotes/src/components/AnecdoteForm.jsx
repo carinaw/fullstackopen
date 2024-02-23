@@ -13,9 +13,8 @@ const AnecdoteForm = () => {
 		event.preventDefault();
 		const content = event.target.anecdote.value;
 		event.target.anecdote.value = "";
-		const newAnecdote = await anecdoteService.create(content);
-		// Await before dispatching, to make sure the note exists before trying to update the state with it.
-		dispatch(createA(newAnecdote));
+
+		dispatch(createA(content));
 		console.log(content, "content!");
 		dispatch(showNotification(`You created the new note "${content}"`));
 		setTimeout(() => {
