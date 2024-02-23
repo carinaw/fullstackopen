@@ -15,6 +15,7 @@ const notificationSlice = createSlice({
 
 export const { showNotification, hideNotification } = notificationSlice.actions;
 
+// this  is here because it's async
 export const setNotification = (message, duration) => {
 	return (dispatch) => {
 		dispatch(showNotification(message));

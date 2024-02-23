@@ -4,6 +4,7 @@ import anecdoteService from "../services/anecdotes";
 const anecdoteSlice = createSlice({
 	name: "anecdotes",
 	initialState: [],
+	// here we update the state because... reducer
 	reducers: {
 		voteThisA(state, action) {
 			const id = action.payload.id;
@@ -11,6 +12,7 @@ const anecdoteSlice = createSlice({
 				anecdote.id === id ? action.payload : anecdote
 			);
 		},
+		// also, this adds a note
 		addAnecdote(state, action) {
 			state.push(action.payload);
 		},
@@ -29,6 +31,7 @@ export const initializeAnecdotes = () => {
 	};
 };
 
+// async help because server!!
 export const createA = (content) => {
 	return async (dispatch) => {
 		const newAnecdote = await anecdoteService.create(content);
@@ -36,6 +39,7 @@ export const createA = (content) => {
 	};
 };
 
+// async search & update on server
 export const vote = (id) => {
 	return async (dispatch, getState) => {
 		const { anecdotes } = getState();
