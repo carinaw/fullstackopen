@@ -13,6 +13,8 @@ const messageReducer = (state, action) => {
 			return `You voted for ${action.payload}!`;
 		case "CLEAR":
 			return "";
+		case "ERROR":
+			return `${action.payload}`;
 		default:
 			return state;
 	}
