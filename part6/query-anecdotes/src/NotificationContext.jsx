@@ -36,7 +36,7 @@ export const NotificationContextProvider = ({ children }) => {
 	);
 };
 
-export const useNotification = () => {
+export const useNotificationContext = () => {
 	const context = useContext(NotificationContext);
 	return context;
 };

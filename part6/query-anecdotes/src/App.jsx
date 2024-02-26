@@ -1,11 +1,11 @@
 import AnecdoteForm from "./components/AnecdoteForm";
 import Notification from "./components/Notification";
-import { useNotification } from "./NotificationContext";
+import { useNotificationContext } from "./NotificationContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAnecdotes, updateAnecdote } from "./requests";
 
 const App = () => {
-	const { state: message, dispatch } = useNotification();
+	const { state: message, dispatch } = useNotificationContext();
 
 	const queryClient = useQueryClient();
 
@@ -40,6 +40,8 @@ const App = () => {
 
 	const anecdotes = result.data;
 
+	const sortedAnecdotes = [...anecdotes].sort((a, b) => b.votes - a.votes);
+
 	return (
 		<div>
 			<h3>Anecdote app</h3>
@@ -47,7 +49,7 @@ const App = () => {
 			<Notification />
 			<AnecdoteForm />
 
-			{anecdotes.map((anecdote) => (
+			{sortedAnecdotes.map((anecdote) => (
 				<div key={anecdote.id}>
 					<div>{anecdote.content}</div>
 					<div>
