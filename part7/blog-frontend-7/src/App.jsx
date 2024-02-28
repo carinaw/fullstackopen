@@ -7,6 +7,8 @@ import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
 import ToggleVisibility from "./components/ToggleVisibility";
 import { useNotification } from "./contexts/NotificationContext";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { getAll } from "./services/blogs";
 
 const Notification = () => {
 	// this {} allows me to destructure!!
@@ -23,12 +25,37 @@ const Notification = () => {
 };
 
 const App = () => {
-	const [blogs, setBlogs] = useState([]);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [user, setUser] = useState(null);
 	const [blogFormVisible, setBlogFormVisible] = useState(false);
 	const { setSuccessMessage, setErrorMessage } = useNotification();
+
+	useEffect(() => {
+		const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+		if (loggedUserJSON) {
+			const user = JSON.parse(loggedUserJSON);
+			setUser(user);
+			blogService.setToken(user.token);
+		}
+	}, []);
+
+	const queryClient = useQueryClient();
+
+	const result = useQuery({
+		queryKey: ["blogs"],
+		queryFn: blogService.getAll,
+		retry: 1,
+	});
+
+	console.log(JSON.parse(JSON.stringify(result)));
+
+	if (result.isLoading) {
+		return <div>loading anecdotes...</div>;
+	}
+
+	const blogs = result.data;
+
 	const handleLogin = async (event) => {
 		event.preventDefault();
 		console.log("logging in with", username, password);
@@ -44,7 +71,7 @@ const App = () => {
 			setUser(user);
 			setUsername("");
 			setPassword("");
-			setSuccessMessage(`${user.name} logged in.`);
+			setSuccessMessage(`${user.name} ${user.username} logged in.`);
 		} catch (exception) {
 			console.log(exception, "something went wrong");
 			setErrorMessage("Wrong username or password. Please try again.");
@@ -52,7 +79,7 @@ const App = () => {
 	};
 
 	const addPost = (post) => {
-		setBlogs([...blogs, post]);
+		// setBlogs([...blogs, post]);
 		setBlogFormVisible(false);
 		setSuccessMessage(`A new blog post named ${post.title} has been added.`);
 	};
@@ -66,6 +93,7 @@ const App = () => {
 	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
 	const handleLikes = async (id) => {
+		// continue here later with useMutation for updating blog posts
 		try {
 			const likedBlog = blogs.find((blog) => blog.id === id);
 			const updatedBlog = await blogService.update(id, {
@@ -93,19 +121,6 @@ const App = () => {
 			console.log("can't delete,", exception);
 		}
 	};
-
-	useEffect(() => {
-		blogService.getAll().then((blogs) => setBlogs(blogs));
-	}, []);
-
-	useEffect(() => {
-		const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
-		if (loggedUserJSON) {
-			const user = JSON.parse(loggedUserJSON);
-			setUser(user);
-			blogService.setToken(user.token);
-		}
-	}, []);
 
 	if (user === null) {
 		return (
@@ -139,6 +154,7 @@ const App = () => {
 					<BlogForm addPost={addPost} />
 				</ToggleVisibility>
 			</div>
+
 			<h2>view all</h2>
 			<div className="blog-list">
 				{sortedBlogs.map((blog) => (
