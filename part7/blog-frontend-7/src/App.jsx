@@ -67,11 +67,9 @@ const App = () => {
 		updatePost.mutate({ id: id, updatedObject: updatedPost });
 	};
 
-	if (result.isLoading) {
-		return <div>loading anecdotes...</div>;
-	}
-
-	const blogs = result.data;
+	// Make sure blogs is an array even if data hasn't arrived from async operation.
+	const blogs = result.data || [];
+	console.log("blogs", blogs);
 
 	const handleLogin = async (event) => {
 		event.preventDefault();
@@ -101,23 +99,40 @@ const App = () => {
 		window.location.reload();
 	};
 
-	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+	const deleteBlogPost = useMutation({
+		mutationFn: (id) => blogService.deletePost(id),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["blogs"],
+			});
+		},
+		onError: () => {
+			setErrorMessage("Error deleting post!");
+		},
+	});
 
-	const handleDelete = async (id, blog) => {
-		try {
-			const deleteBlog = blogs.find((blog) => blog.id === id);
-			if (
-				confirm(
-					`Do you really want to delete the post ${deleteBlog.title} from ${deleteBlog.author}?`
-				)
-			) {
-				await blogService.deletePost(deleteBlog.id);
-				setBlogs(blogs.filter((b) => b.id !== deleteBlog.id));
-			}
-		} catch (exception) {
-			console.log("can't delete,", exception);
+	// CONTINUE HERE
+	const handleDelete = async (id) => {
+		const postToDelete = blogs.find((blog) => blog.id === id);
+		if (!postToDelete) {
+			window.alert("No post to delete!");
 		}
+
+		if (
+			window.confirm(
+				`Do you really want to delete the post ${postToDelete.title} from ${postToDelete.author}?`
+			)
+		)
+			deleteBlogPost.mutate(id);
+		setSuccessMessage("Blog post has been deleted successfully.");
 	};
+
+	if (result.isLoading) {
+		return <div>loading anecdotes...</div>;
+	}
+
+	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+	console.log(sortedBlogs, "sorted");
 
 	if (user === null) {
 		return (
