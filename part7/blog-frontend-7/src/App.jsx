@@ -47,8 +47,25 @@ const App = () => {
 		queryFn: blogService.getAll,
 		retry: 1,
 	});
-
 	console.log(JSON.parse(JSON.stringify(result)));
+
+	const updatePost = useMutation({
+		mutationFn: blogService.update,
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["blogs"],
+			});
+		},
+	});
+
+	const handleLikes = (id, blog) => {
+		// continue here later with useMutation for updating blog posts
+		console.log("blog to like", blog);
+
+		const updatedPost = { ...blog, likes: blog.likes + 1 };
+
+		updatePost.mutate({ id: id, updatedObject: updatedPost });
+	};
 
 	if (result.isLoading) {
 		return <div>loading anecdotes...</div>;
@@ -78,12 +95,6 @@ const App = () => {
 		}
 	};
 
-	const addPost = (post) => {
-		// setBlogs([...blogs, post]);
-		setBlogFormVisible(false);
-		setSuccessMessage(`A new blog post named ${post.title} has been added.`);
-	};
-
 	const handleLogout = () => {
 		window.localStorage.removeItem("loggedBlogappUser");
 		window.localStorage.clear();
@@ -91,20 +102,6 @@ const App = () => {
 	};
 
 	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
-
-	const handleLikes = async (id) => {
-		// continue here later with useMutation for updating blog posts
-		try {
-			const likedBlog = blogs.find((blog) => blog.id === id);
-			const updatedBlog = await blogService.update(id, {
-				...likedBlog,
-				likes: likedBlog.likes + 1,
-			});
-			setBlogs(blogs.map((blog) => (blog.id === id ? updatedBlog : blog)));
-		} catch (exception) {
-			console.log("error updating likes", exception);
-		}
-	};
 
 	const handleDelete = async (id, blog) => {
 		try {
@@ -151,7 +148,7 @@ const App = () => {
 					setHiddenLabel="cancel"
 					setVisibleLabel="add blog post"
 				>
-					<BlogForm addPost={addPost} />
+					<BlogForm />
 				</ToggleVisibility>
 			</div>
 
@@ -163,7 +160,7 @@ const App = () => {
 						blog={blog}
 						user={user}
 						handleDelete={() => handleDelete(blog.id)}
-						handleLikes={() => handleLikes(blog.id)}
+						handleLikes={() => handleLikes(blog.id, blog)}
 						className="blog"
 					/>
 				))}
