@@ -9,6 +9,7 @@ import ToggleVisibility from "./components/ToggleVisibility";
 import { useNotification } from "./contexts/NotificationContext";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { getAll } from "./services/blogs";
+import { useUser } from "./contexts/UserContext";
 
 const Notification = () => {
 	// this {} allows me to destructure!!
@@ -27,15 +28,46 @@ const Notification = () => {
 const App = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [user, setUser] = useState(null);
+	// const [user, setUser] = useState(null);
 	const [blogFormVisible, setBlogFormVisible] = useState(false);
 	const { setSuccessMessage, setErrorMessage } = useNotification();
+	const { state, dispatch } = useUser();
+
+	const user = state.user;
+
+	const handleLogin = async (event) => {
+		event.preventDefault();
+		console.log("logging in with", username, password);
+
+		try {
+			const user = await loginService.login({
+				username,
+				password,
+			});
+
+			window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+			blogService.setToken(user.token);
+			dispatch({ type: "LOGIN", payload: user });
+			setPassword("");
+			setSuccessMessage(`${user.name} ${user.username} logged in.`);
+		} catch (exception) {
+			console.log(exception, "something went wrong");
+			setErrorMessage("Wrong username or password. Please try again.");
+		}
+	};
+
+	const handleLogout = () => {
+		window.localStorage.removeItem("loggedBlogappUser");
+		window.localStorage.clear();
+		window.location.reload();
+		dispatch({ type: "LOGOUT" });
+	};
 
 	useEffect(() => {
 		const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
 		if (loggedUserJSON) {
 			const user = JSON.parse(loggedUserJSON);
-			setUser(user);
+			dispatch({ type: "LOGIN", payload: user });
 			blogService.setToken(user.token);
 		}
 	}, []);
@@ -71,34 +103,6 @@ const App = () => {
 	const blogs = result.data || [];
 	console.log("blogs", blogs);
 
-	const handleLogin = async (event) => {
-		event.preventDefault();
-		console.log("logging in with", username, password);
-
-		try {
-			const user = await loginService.login({
-				username,
-				password,
-			});
-
-			window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
-			blogService.setToken(user.token);
-			setUser(user);
-			setUsername("");
-			setPassword("");
-			setSuccessMessage(`${user.name} ${user.username} logged in.`);
-		} catch (exception) {
-			console.log(exception, "something went wrong");
-			setErrorMessage("Wrong username or password. Please try again.");
-		}
-	};
-
-	const handleLogout = () => {
-		window.localStorage.removeItem("loggedBlogappUser");
-		window.localStorage.clear();
-		window.location.reload();
-	};
-
 	const deleteBlogPost = useMutation({
 		mutationFn: (id) => blogService.deletePost(id),
 		onSuccess: () => {
@@ -128,7 +132,7 @@ const App = () => {
 	};
 
 	if (result.isLoading) {
-		return <div>loading anecdotes...</div>;
+		return <div>loading...</div>;
 	}
 
 	const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
