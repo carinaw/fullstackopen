@@ -10,6 +10,75 @@ import { useNotification } from "./contexts/NotificationContext";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { getAll } from "./services/blogs";
 import { useUser } from "./contexts/UserContext";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Link,
+	useParams,
+} from "react-router-dom";
+import Users from "./components/Users";
+import UserDetails from "./components/UserDetails";
+import BlogDetails from "./components/BlogDetails";
+import {
+	Box,
+	Text,
+	Flex,
+	Button,
+	Spacer,
+	Heading,
+	SimpleGrid,
+	CardBody,
+	Card,
+	Link as ChakraLink,
+	Stack,
+} from "@chakra-ui/react";
+
+const Menu = ({ user, handleLogout }) => {
+	console.log(user);
+	return (
+		<Flex
+			minWidth="max-content"
+			alignItems="center"
+			gap="2"
+			padding="1.5em"
+			bg="teal"
+			textColor="white"
+		>
+			<Box w="200px">
+				<Heading fontSize="2xl" noOfLines={1}>
+					blog app
+				</Heading>
+			</Box>
+
+			<Box w="80px">
+				<ChakraLink>
+					<Link to="/">blogs</Link>
+				</ChakraLink>
+			</Box>
+			<Box w="80px">
+				<ChakraLink>
+					<Link to="/users">users</Link>
+				</ChakraLink>
+			</Box>
+			<Spacer />
+			<Box mr="20px">
+				{user.name} {user.username} is logged in.{" "}
+			</Box>
+
+			<Box>
+				<Button
+					padding="10px"
+					borderRadius="6px"
+					colorScheme="blackAlpha"
+					onClick={handleLogout}
+				>
+					logout
+				</Button>
+			</Box>
+		</Flex>
+	);
+};
 
 const Notification = () => {
 	// this {} allows me to destructure!!
@@ -34,7 +103,7 @@ const App = () => {
 	const { state, dispatch } = useUser();
 
 	const user = state.user;
-
+	const id = useParams().id;
 	const handleLogin = async (event) => {
 		event.preventDefault();
 		console.log("logging in with", username, password);
@@ -141,50 +210,84 @@ const App = () => {
 	if (user === null) {
 		return (
 			<div>
-				<Notification />
-
-				<LoginForm
-					username={username}
-					password={password}
-					handleLogin={handleLogin}
-					handleUsernameChange={({ target }) => setUsername(target.value)}
-					handlePasswordChange={({ target }) => setPassword(target.value)}
-				/>
+				<SimpleGrid minChildWidth="120px" spacing="40px">
+					<Box>
+						<LoginForm
+							username={username}
+							password={password}
+							handleLogin={handleLogin}
+							handleUsernameChange={({ target }) => setUsername(target.value)}
+							handlePasswordChange={({ target }) => setPassword(target.value)}
+						/>
+					</Box>
+				</SimpleGrid>
 			</div>
 		);
 	}
 
 	return (
-		<div>
-			<h2>blog posts</h2>
-			<Notification />
-			<p>
-				{user.name} {user.username} is logged in.{" "}
-				<button onClick={handleLogout}>logout</button>
-			</p>
-			<div>
-				<ToggleVisibility
-					setHiddenLabel="cancel"
-					setVisibleLabel="add blog post"
-				>
-					<BlogForm />
-				</ToggleVisibility>
-			</div>
-
-			<h2>view all</h2>
-			<div className="blog-list">
-				{sortedBlogs.map((blog) => (
-					<Blog
-						key={blog.id}
-						blog={blog}
+		<Router>
+			<Menu user={user} handleLogout={handleLogout} />
+			<Box
+				minWidth="max-content"
+				alignItems="left"
+				gap="2"
+				padding="1.5em"
+				textColor="black"
+			>
+				<Notification />
+				<Routes>
+					<Route
+						path="/"
+						element={
+							<>
+								<Stack direction="row" spacing="24px">
+									<Box my="1em">
+										<ToggleVisibility
+											setHiddenLabel="cancel"
+											setVisibleLabel="add blog post"
+										>
+											{" "}
+											<BlogForm />
+										</ToggleVisibility>
+									</Box>
+								</Stack>
+								<Box my="1em">
+									<Heading as="h2">all blog posts</Heading>
+								</Box>
+								<Box className="blog-list">
+									<SimpleGrid columns={3} spacing="60px">
+										{sortedBlogs.map((blog) => (
+											<Box key={blog.id} height="80px">
+												<Blog
+													key={blog.id}
+													blog={blog}
+													user={user}
+													handleDelete={() => handleDelete(blog.id)}
+													handleLikes={() => handleLikes(blog.id, blog)}
+													className="blog"
+												/>
+											</Box>
+										))}
+									</SimpleGrid>
+								</Box>
+							</>
+						}
 						user={user}
-						handleDelete={() => handleDelete(blog.id)}
-						handleLikes={() => handleLikes(blog.id, blog)}
-						className="blog"
+						blogs={blogs}
 					/>
-				))}
-			</div>
-		</div>
+					<Route path="/users" element={<Users />}></Route>
+					<Route
+						path="/users/:id"
+						element={<UserDetails user={user} />}
+					></Route>
+					<Route
+						path="/blogs/:id"
+						element={<BlogDetails handleLikes={handleLikes} />}
+					></Route>
+				</Routes>
+			</Box>
+		</Router>
 	);
 };
 export default App;

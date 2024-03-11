@@ -16,11 +16,17 @@
     "testEnvironment": "jsdom"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
     "axios": "^1.4.0",
+    "framer-motion": "^6.5.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-query": "^3.39.3"
+    "react-query": "^3.39.3",
+    "react-router": "^6.22.2",
+    "react-router-dom": "^6.22.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
