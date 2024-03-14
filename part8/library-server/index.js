@@ -1,133 +1,41 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
-const { v1: uuid } = require("uuid");
+const { GraphQLError } = require("graphql");
+const mongoose = require("mongoose");
+mongoose.set("strictQuery", false);
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
-let books = [
-	{
-		title: "Galactic Odyssey",
-		author: "Lena Orion",
-		published: "2021",
-		genres: ["Science Fiction", "Adventure"],
-	},
-	{
-		title: "The Last Mage",
-		author: "Erik Stormweaver",
-		published: "2019",
-		genres: ["Fantasy", "Epic"],
-	},
-	{
-		title: "Quantum Shadows",
-		author: "Claire Hastings",
-		published: "2020",
-		genres: ["Science Fiction", "Mystery"],
-	},
-	{
-		title: "Empire of the Forgotten",
-		author: "Diana Winters",
-		published: "2018",
-		genres: ["Fantasy", "Drama"],
-	},
-	{
-		title: "Starlight Crusader",
-		author: "Marcus Vega",
-		published: "2022",
-		genres: ["Science Fiction", "Action"],
-	},
-	{
-		title: "The Dreaming Towers",
-		author: "Sophie Green",
-		published: "2017",
-		genres: ["Fantasy", "Adventure"],
-	},
-	{
-		title: "Nebula's Heart",
-		author: "Ian Blackwood",
-		published: "2023",
-		genres: ["Science Fiction", "Romance"],
-	},
-	{
-		title: "Chronicles of the Wind",
-		author: "Natalie Windsong",
-		published: "2015",
-		genres: ["Fantasy", "Mythology"],
-	},
-	{
-		title: "Voidwalkers",
-		author: "Leo Night",
-		published: "2022",
-		genres: ["Science Fiction", "Horror"],
-	},
-	{
-		title: "The Enchanted Forest",
-		author: "Ava Moon",
-		published: "2016",
-		genres: ["Fantasy", "Young Adult"],
-	},
-];
+const Book = require("./models/Book");
+const Author = require("./models/Author");
+const User = require("./models/User");
 
-let authors = [
-	{
-		name: "Lena Orion",
-		born: "1985",
-		bookCount: 5,
-	},
-	{
-		name: "Erik Stormweaver",
-		born: "1972",
-		bookCount: 3,
-	},
-	{
-		name: "Claire Hastings",
-		born: "1988",
-		bookCount: 7,
-	},
-	{
-		name: "Diana Winters",
-		born: "1990",
-		bookCount: 4,
-	},
-	{
-		name: "Marcus Vega",
-		born: "1978",
-		bookCount: 6,
-	},
-	{
-		name: "Sophie Green",
-		born: "1983",
-		bookCount: 8,
-	},
-	{
-		name: "Ian Blackwood",
-		born: "1975",
-		bookCount: 2,
-	},
-	{
-		name: "Natalie Windsong",
-		born: "1980",
-		bookCount: 5,
-	},
-	{
-		name: "Leo Night",
-		born: "1987",
-		bookCount: 3,
-	},
-	{
-		name: "Ava Moon",
-		born: "1992",
-		bookCount: 4,
-	},
-];
+const MONGODB_URI = process.env.MONGODB_URI;
 
-const typeDefs = `type Query {
+console.log("connecting to", MONGODB_URI);
+
+mongoose
+	.connect(MONGODB_URI)
+	.then(() => {
+		console.log("connected to MongoDB");
+	})
+	.catch((error) => {
+		console.log("error connection to MongoDB:", error.message);
+	});
+
+const typeDefs = `
+
+type Query {
     bookCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     authorCount: Int!
     allAuthors: [Author!]!
+	me: User
 }
 
 type Book {
-    title: String!
-    author: Author!
+    title: String
+    author: Author
     published: String
     genres: [String]
     id: ID!
@@ -137,6 +45,17 @@ type Author {
     name: String!
     bookCount: Int!
     born: Int
+}
+
+
+type User {
+	username: String!
+	favoriteGenre: String!
+	id: ID!
+}
+
+type Token {
+	value: String!
 }
 
 type Mutation {
@@ -150,60 +69,210 @@ type Mutation {
         name: String!
         setBornTo: Int!
         ): Author
-}`;
+	createUser(
+		username: String!
+		favoriteGenre: String!): User
+	login(
+		username: String!
+		password: String!): Token
+}
+`;
 
 const resolvers = {
 	Query: {
-		bookCount: () => books.length,
-		authorCount: () => authors.length,
-		allBooks: (root, args) => {
-			let filteredBooks = books;
+		bookCount: async () => Book.collection.countDocuments(),
+		authorCount: async () => Author.collection.countDocuments(),
+		allBooks: async (root, args) => {
+			try {
+				if (!args.author && !args.genre) {
+					const books = await Book.find({}).populate("author");
+					console.log("Type of fetched data:", typeof books);
+					console.log("Is array:", Array.isArray(books));
 
-			if (args.author) {
-				filteredBooks = filteredBooks.filter((b) => b.author === args.author);
-			}
-			if (args.genre) {
-				filteredBooks = filteredBooks.filter((b) => b.genre === args.genre);
-			}
+					return books;
+				}
 
-			return filteredBooks;
+				if (args.author && !args.genre) {
+					const books = await Book.find({}).populate({
+						path: "author",
+						match: { name: args.author },
+					});
+					return books.filter((book) => book.author !== null);
+				}
+
+				if (!args.author && args.genre) {
+					const books = await Book.find({
+						genres: { $in: [args.genre] },
+					}).populate("author");
+					return books;
+				}
+
+				if (args.author && args.genre) {
+					const books = await Book.find({
+						genres: { $in: [args.genre] },
+					}).populate(
+						populate({
+							path: "author",
+							match: { name: args.author },
+						})
+					);
+					return books.filter((book) => book.author !== null);
+				}
+			} catch (error) {
+				console.error("nope", error);
+				throw new Error("failed to fetch");
+			}
 		},
-		allAuthors: () =>
-			authors.map((author) => ({
-				...author,
-				bookCount: books.filter((book) => author.name === book.author).length,
-			})),
+		allAuthors: async () => {
+			const authors = await Author.find({});
+
+			const authorsWithBookCount = authors.map(async (author) => {
+				const bookCount = await Book.countDocuments({
+					author: author._id,
+				});
+
+				return {
+					...author.toObject(),
+					bookCount,
+				};
+			});
+			return Promise.all(authorsWithBookCount);
+		},
+		me: async (root, args, context) => {
+			if (!context.currentUser) {
+				throw new GraphQLError("not authenticated");
+			}
+			console.log(context.currentUser);
+			return context.currentUser;
+		},
 	},
 	Book: {
-		author: (root) => {
+		author: async (root) => {
 			return {
-				name: root.author,
-				bookCount: books.filter((b) => b.author === root.author).length,
+				name: root.author.name,
+				born: root.author.born,
 			};
 		},
 	},
+
 	Mutation: {
-		addBook: (root, args) => {
-			const book = { ...args, id: uuid() };
-			// Could also use .some which is semantically more logical because it returns a boolean. Just reminder to myself.
-
-			if (!authors.find((author) => author.name === args.author)) {
-				authors.push({ name: args.author, bookCount: 1 });
+		addBook: async (root, args, context) => {
+			if (!context.currentUser) {
+				throw new GraphQLError("not authenticated");
 			}
-			books = books.concat(book);
 
-			return book;
+			author = await Author.findOne({ name: args.author });
+
+			if (args.author.length < 3) {
+				throw new GraphQLError("author name too short", {
+					extensions: {
+						code: "BAD_USER_INPUT",
+						invalidArgs: args.author,
+					},
+				});
+			}
+			if (!author) {
+				author = new Author({ name: args.author });
+				await author.save();
+			}
+
+			if (args.title.length < 3) {
+				throw new GraphQLError("title too short", {
+					extensions: {
+						code: "BAD_USER_INPUT",
+						invalidArgs: args.title,
+					},
+				});
+			}
+
+			try {
+				const book = new Book({
+					title: args.title,
+					published: args.published,
+					author: author._id,
+					genres: args.genres,
+				});
+				// Could also use .some which is semantically more logical because it returns a boolean. Just reminder to myself.
+				console.log("Book", book);
+				await book.save();
+				return book.populate("author");
+			} catch (error) {
+				console.error("error adding book", error);
+				throw new GraphQLError("failed to add book");
+			}
 		},
-		editAuthor: (root, args) => {
-			const author = authors.find((author) => author.name === args.name);
+		editAuthor: async (root, args, context) => {
+			if (!context.currentUser) {
+				throw new GraphQLError("not authenticated");
+			}
+			const authors = await Author.find({});
+			console.log("log authors", authors);
 
+			const author = await Author.findOne({ name: args.name.trim() });
+			console.log("author", typeof args.name);
 			if (!author) {
 				return null;
 			}
 
-			const updatedAuthor = { ...author, born: args.setBornTo };
-			authors = authors.map((a) => (a.name === args.name ? updatedAuthor : a));
-			return updatedAuthor;
+			author.born = args.setBornTo;
+
+			if (args.setBornTo > 2006) {
+				throw new GraphQLError("choose a valid birth year", {
+					extensions: {
+						code: "BAD_USER_INPUT",
+						invalidArgs: args.setBornTo,
+					},
+				});
+			}
+
+			try {
+				await author.save();
+
+				return author;
+			} catch (error) {
+				console.error("error updating", error);
+				throw new Error("failed to update");
+			}
+		},
+		createUser: async (root, args) => {
+			console.log(args);
+			try {
+				const user = new User({
+					username: args.username,
+					favoriteGenre: args.favoriteGenre,
+				});
+				console.log(user);
+				return user.save();
+			} catch (error) {
+				throw new GraphQLError("creating user failed", {
+					extensions: {
+						code: "BAD_USER_INPUT",
+						invalidArgs: args.username,
+						error,
+					},
+				});
+			}
+		},
+		login: async (root, args) => {
+			const user = await User.findOne({ username: args.username });
+
+			if (!user || args.password !== "secret") {
+				throw (
+					(new GraphQLError("wrong credentials"),
+					{
+						extensions: {
+							code: "BAD_USER_INPUT",
+						},
+					})
+				);
+			}
+
+			const userForToken = {
+				username: args.username,
+				id: user._id,
+			};
+			console.log("token", userForToken);
+			return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
 		},
 	},
 };
@@ -215,6 +284,23 @@ const server = new ApolloServer({
 
 startStandaloneServer(server, {
 	listen: { port: 4000 },
+	context: async ({ req, res }) => {
+		const auth = req ? req.headers.authorization : null;
+		if (auth && auth.toLowerCase().startsWith("bearer ")) {
+			try {
+				const decodedToken = jwt.verify(
+					auth.substring(7),
+					process.env.JWT_SECRET
+				);
+				const currentUser = await User.findById(decodedToken.id);
+				return { currentUser };
+			} catch (error) {
+				console.error(error);
+				return {};
+			}
+		}
+		return {};
+	},
 }).then(({ url }) => {
 	console.log(`Server ready at ${url}`);
 });
