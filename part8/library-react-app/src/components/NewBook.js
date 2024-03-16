@@ -2,6 +2,7 @@ import { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 import { ALL_BOOKS } from "./Books";
 import { ALL_AUTHORS } from "./Authors";
+import { useNavigate } from "react-router-dom";
 
 const CREATE_BOOK = gql`
 	mutation createBook(
@@ -32,7 +33,7 @@ const NewBook = ({ setError }) => {
 	const [published, setPublished] = useState("");
 	const [genre, setGenre] = useState("");
 	const [genres, setGenres] = useState([]);
-
+	const navigate = useNavigate();
 	const padding = {
 		padding: 10,
 	};
@@ -57,6 +58,7 @@ const NewBook = ({ setError }) => {
 		setAuthor("");
 		setGenres([]);
 		setGenre("");
+		navigate("/books");
 	};
 
 	const addGenre = () => {

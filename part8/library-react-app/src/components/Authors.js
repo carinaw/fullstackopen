@@ -1,8 +1,6 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { useState } from "react";
-import { ALL_BOOKS } from "./Books";
 import Select from "react-select";
-import AsyncSelect from "react-select/async";
 
 export const ALL_AUTHORS = gql`
 	query {
@@ -23,7 +21,7 @@ const UPDATE_AUTHOR = gql`
 	}
 `;
 
-const Authors = ({ setError }) => {
+const Authors = ({ setError, token }) => {
 	const [selectedAuthor, setSelectedAuthor] = useState(null);
 
 	const [name, setName] = useState("");
@@ -84,28 +82,30 @@ const Authors = ({ setError }) => {
 					))}
 				</tbody>
 			</table>
-			<div>
-				<h2>set birth year</h2>
-				<form onSubmit={submit}>
-					<div>
-						<Select
-							options={authorOptions}
-							value={selectedAuthor}
-							onChange={setSelectedAuthor}
-							placeholder="Choose author"
-						/>
-					</div>
-					<div>
-						born:{" "}
-						<input
-							type="number"
-							value={setBornTo}
-							onChange={({ target }) => setSetBornTo(target.value)}
-						/>
-					</div>
-					<button type="submit">submit</button>
-				</form>
-			</div>
+			{token && (
+				<div>
+					<h2>set birth year</h2>
+					<form onSubmit={submit}>
+						<div>
+							<Select
+								options={authorOptions}
+								value={selectedAuthor}
+								onChange={setSelectedAuthor}
+								placeholder="Choose author"
+							/>
+						</div>
+						<div>
+							born:{" "}
+							<input
+								type="number"
+								value={setBornTo}
+								onChange={({ target }) => setSetBornTo(target.value)}
+							/>
+						</div>
+						<button type="submit">submit</button>
+					</form>
+				</div>
+			)}
 		</div>
 	);
 };

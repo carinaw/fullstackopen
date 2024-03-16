@@ -80,7 +80,6 @@ type Mutation {
 
 const resolvers = {
 	Query: {
-		bookCount: async () => Book.collection.countDocuments(),
 		authorCount: async () => Author.collection.countDocuments(),
 		allBooks: async (root, args) => {
 			try {
@@ -152,6 +151,12 @@ const resolvers = {
 				name: root.author.name,
 				born: root.author.born,
 			};
+		},
+	},
+	Author: {
+		bookCount: async (author) => {
+			const count = await Book.countDocuments({ author: author._id });
+			return count;
 		},
 	},
 
@@ -286,7 +291,7 @@ startStandaloneServer(server, {
 	listen: { port: 4000 },
 	context: async ({ req, res }) => {
 		const auth = req ? req.headers.authorization : null;
-		if (auth && auth.toLowerCase().startsWith("bearer ")) {
+		if (auth && auth.startsWith("Bearer ")) {
 			try {
 				const decodedToken = jwt.verify(
 					auth.substring(7),
