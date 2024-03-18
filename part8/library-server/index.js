@@ -36,6 +36,8 @@ mongoose
 		console.log("error connection to MongoDB:", error.message);
 	});
 
+mongoose.set("debug", true);
+
 const start = async () => {
 	const app = express();
 	const httpServer = http.createServer(app);
@@ -66,6 +68,8 @@ const start = async () => {
 
 	await server.start();
 
+	const userCache = new Map();
+
 	app.use(
 		"/",
 		cors(),
@@ -74,12 +78,17 @@ const start = async () => {
 			context: async ({ req, res }) => {
 				const auth = req ? req.headers.authorization : null;
 				if (auth && auth.startsWith("Bearer ")) {
+					const token = auth.substring(7);
+					if (userCache.has(token)) {
+						return { currentUser: userCache.get(token) };
+					}
 					try {
 						const decodedToken = jwt.verify(
 							auth.substring(7),
 							process.env.JWT_SECRET
 						);
 						const currentUser = await User.findById(decodedToken.id);
+						userCache.set(token, currentUser);
 						return { currentUser };
 					} catch (error) {
 						console.error(error);

@@ -1,31 +1,7 @@
 import { useState } from "react";
-import { gql, useMutation } from "@apollo/client";
-import { ALL_BOOKS } from "./Books";
-import { ALL_AUTHORS } from "./Authors";
+import { useMutation, useSubscription } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-
-const CREATE_BOOK = gql`
-	mutation createBook(
-		$title: String!
-		$author: String!
-		$published: String!
-		$genres: [String]
-	) {
-		addBook(
-			title: $title
-			author: $author
-			published: $published
-			genres: $genres
-		) {
-			title
-			author {
-				name
-			}
-			published
-			genres
-		}
-	}
-`;
+import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED, CREATE_BOOK } from "../queries";
 
 const NewBook = ({ setError }) => {
 	const [title, setTitle] = useState("");
@@ -58,13 +34,20 @@ const NewBook = ({ setError }) => {
 		setAuthor("");
 		setGenres([]);
 		setGenre("");
-		navigate("/books");
 	};
 
 	const addGenre = () => {
 		setGenres(genres.concat(genre));
 		setGenre("");
 	};
+
+	useSubscription(BOOK_ADDED, {
+		onData: ({ data }) => {
+			window.alert("New book added!");
+			navigate("/books");
+		},
+		onError: (error) => console.error("Subscription error:", error),
+	});
 
 	return (
 		<div style={padding}>

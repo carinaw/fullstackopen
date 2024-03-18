@@ -53,25 +53,16 @@ const resolvers = {
 			}
 		},
 		allAuthors: async () => {
-			const authors = await Author.find({});
-
-			const authorsWithBookCount = authors.map(async (author) => {
-				const bookCount = await Book.countDocuments({
-					author: author._id,
-				});
-
-				return {
-					...author.toObject(),
-					bookCount,
-				};
-			});
-			return Promise.all(authorsWithBookCount);
+			console.log("Author.find");
+			const authors = await Author.find({}).populate("bookCount");
+			return authors.map((author) => author.toObject());
 		},
 		me: async (root, args, context) => {
 			if (!context.currentUser) {
 				throw new GraphQLError("not authenticated");
 			}
 			console.log(context.currentUser);
+
 			return context.currentUser;
 		},
 	},
@@ -81,12 +72,6 @@ const resolvers = {
 				name: root.author.name,
 				born: root.author.born,
 			};
-		},
-	},
-	Author: {
-		bookCount: async (author) => {
-			const count = await Book.countDocuments({ author: author._id });
-			return count;
 		},
 	},
 
@@ -192,6 +177,8 @@ const resolvers = {
 			}
 		},
 		login: async (root, args) => {
+			// console.log("User.findOne");
+
 			const user = await User.findOne({ username: args.username });
 
 			if (!user || args.password !== "secret") {

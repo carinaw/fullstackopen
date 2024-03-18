@@ -3,14 +3,8 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import Login from "./components/Login";
 import Recommendation from "./components/Recommendation";
-import { useState, useEffect } from "react";
-import {
-	BrowserRouter as Router,
-	Routes,
-	Route,
-	Link,
-	NavLink,
-} from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useApolloClient } from "@apollo/client";
 import { loadErrorMessages } from "@apollo/client/dev";
 
@@ -56,10 +50,13 @@ const App = () => {
 		}
 	}, []);
 
-	const tokenInStorage = (newToken) => {
-		localStorage.setItem("library-user-token", newToken); // Save the new token to localStorage
-		setToken(newToken); // Also update the state with the new token
-	};
+	const tokenInStorage = useCallback(
+		(newToken) => {
+			localStorage.setItem("library-user-token", newToken); // Save the new token to localStorage
+			setToken(newToken); // Also update the state with the new token
+		},
+		[setToken]
+	);
 
 	console.log(token, "token");
 

@@ -1,33 +1,15 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
+import { CURRENT_USER, RECOMMENDATION } from "../queries";
 
 // change query
-
-export const CURRENT_USER = gql`
-	query {
-		me {
-			favoriteGenre
-		}
-	}
-`;
-
-export const RECOMMENDATION = gql`
-	query GetFavoriteGenreBooks($genre: String) {
-		allBooks(genre: $genre) {
-			title
-			author {
-				name
-			}
-			published
-			genres
-		}
-	}
-`;
 
 const Recommendation = () => {
 	const [favoriteGenre, setFavoriteGenre] = useState(null);
 
-	const { loading: userLoading, data: userData } = useQuery(CURRENT_USER);
+	const { loading: userLoading, data: userData } = useQuery(CURRENT_USER, {
+		fetchPolicy: "cache-first",
+	});
 	console.log(userData, "userData");
 
 	useEffect(() => {
@@ -44,7 +26,6 @@ const Recommendation = () => {
 	const padding = {
 		padding: 10,
 	};
-	console.log(booksData, "booksData");
 
 	if (userLoading || booksLoading) {
 		return <div>is loading...</div>;
