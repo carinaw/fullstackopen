@@ -28,7 +28,7 @@ const parseArguments = (input: string[]): ExerciseInput => {
 	return { target, dailyHours };
 };
 
-const calculateExercises = (
+export const calculateExercises = (
 	target: number,
 	dailyHours: number[]
 ): ExerciseFeedback => {
@@ -42,8 +42,8 @@ const calculateExercises = (
 
 	const targetReached = averageTime >= target;
 
-	let rating: number;
-	let comment: string;
+	let rating: number = 0;
+	let comment: string = "";
 
 	if (averageTime < target) {
 		rating = 1;
@@ -72,5 +72,8 @@ try {
 
 	console.log(calculateExercises(args.target, args.dailyHours));
 } catch (error) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 	console.error("Error:", error.message);
 }
+
+export default calculateExercises;
