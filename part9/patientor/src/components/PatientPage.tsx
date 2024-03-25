@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { Patient } from "../types";
+import { Patient, Entry } from "../types";
 import { useEffect, useState } from "react";
 import FemaleIcon from "@mui/icons-material/Female";
 import MaleIcon from "@mui/icons-material/Male";
@@ -14,13 +14,21 @@ interface Props {
 const PatientPage = ({ patients }: Props) => {
 	const { id } = useParams<{ id: string }>();
 	const [patient, setPatient] = useState<Patient | null>(null);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		if (id) {
+			setLoading(true);
 			patientService
 				.getPatient(id)
-				.then((response) => setPatient(response))
-				.catch((error) => console.error(error));
+				.then((response) => {
+					setPatient(response);
+					setLoading(false);
+				})
+				.catch((error) => {
+					console.error(error);
+					setLoading(false);
+				});
 		}
 	}, [id]);
 
@@ -30,10 +38,16 @@ const PatientPage = ({ patients }: Props) => {
 		} else if (patient?.gender === "male") {
 			return <MaleIcon />;
 		} else {
-			// Return null or an empty fragment if gender is "other" or undefined
 			return null;
 		}
 	};
+
+	if (loading)
+		return (
+			<div style={{ marginBottom: "1em", marginTop: "1em" }} className="App">
+				Loading...
+			</div>
+		);
 
 	return (
 		<div className="App">
@@ -47,6 +61,20 @@ const PatientPage = ({ patients }: Props) => {
 
 			<Box style={{ marginBottom: "0.5em" }}>
 				occupation: {patient?.occupation}
+			</Box>
+			<Box style={{ marginBottom: "0.5em" }}>
+				<Typography variant="h6">entries</Typography>
+
+				{patient?.entries?.map((entry, id) => (
+					<Box style={{ marginBottom: "1em", marginTop: "1em" }} key={id}>
+						{entry.date} {entry.description}
+						<Box style={{ marginBottom: "1em", marginTop: "1em" }}>
+							{entry.diagnosisCodes?.map((code) => (
+								<li>{code}</li>
+							))}
+						</Box>
+					</Box>
+				))}
 			</Box>
 		</div>
 	);

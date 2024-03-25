@@ -1,5 +1,30 @@
 import { NewPatient } from "./src/types";
 import { Gender } from "./src/types";
+import { Entry } from "./src/types";
+// Import the specific Entry types
+
+const isValidEntryType = (entry: unknown): entry is Entry => {
+	if (typeof entry === "object" && entry !== null) {
+		const type = (entry as { type?: unknown }).type;
+		const validTypes = ["Hospital", "OccupationalHealthcare", "HealthCheck"];
+		return typeof type === "string" && validTypes.includes(type);
+	}
+	return false;
+};
+
+const parseEntries = (entries: unknown): Entry[] => {
+	if (!Array.isArray(entries)) {
+		throw new Error("Incorrect or missing entries array");
+	}
+
+	return entries.map((entry: unknown) => {
+		if (!isValidEntryType(entry)) {
+			throw new Error("Entry is not valid");
+		}
+		// At this point, TypeScript knows entry is one of the specific Entry types
+		return entry;
+	});
+};
 
 const toNewPatient = (object: unknown): NewPatient => {
 	if (!object || typeof object !== "object") {
@@ -10,7 +35,8 @@ const toNewPatient = (object: unknown): NewPatient => {
 		"dateOfBirth" in object &&
 		"gender" in object &&
 		"occupation" in object &&
-		"ssn" in object
+		"ssn" in object &&
+		"entries" in object
 	) {
 		const newPatient: NewPatient = {
 			name: parseName(object.name),
@@ -18,6 +44,7 @@ const toNewPatient = (object: unknown): NewPatient => {
 			gender: parseGender(object.gender),
 			occupation: parseOccupation(object.occupation),
 			ssn: parseSsn(object.ssn),
+			entries: parseEntries(object.entries),
 		};
 		return newPatient;
 	}
