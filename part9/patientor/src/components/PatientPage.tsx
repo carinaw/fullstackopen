@@ -1,20 +1,27 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { Patient, Entry } from "../types";
+import { Patient, Diagnosis, EntryForm } from "../types";
 import { useEffect, useState } from "react";
 import FemaleIcon from "@mui/icons-material/Female";
 import MaleIcon from "@mui/icons-material/Male";
 import patientService from "../services/patients";
+import diagnoseService from "../services/diagnoses";
+import EntryDetails from "./EntryDetails";
+import AddEntryForm from "./AddEntryForm";
 
 interface Props {
 	patients: Patient[];
 	patient: Patient;
+	diagnosis: Diagnosis;
 }
 
-const PatientPage = ({ patients }: Props) => {
+const PatientPage = (): Props => {
 	const { id } = useParams<{ id: string }>();
 	const [patient, setPatient] = useState<Patient | null>(null);
+	const [diagnoses, setDiagnoses] = useState<Diagnosis[] | null>(null);
 	const [loading, setLoading] = useState(false);
+	const [showAddEntryForm, setShowAddEntryForm] = useState(false);
+	const [entryError, setEntryError] = useState("");
 
 	useEffect(() => {
 		if (id) {
@@ -31,6 +38,19 @@ const PatientPage = ({ patients }: Props) => {
 				});
 		}
 	}, [id]);
+
+	useEffect(() => {
+		diagnoseService
+			.getAll()
+			.then((response) => {
+				console.log(response);
+				setDiagnoses(response);
+			})
+			.catch((error) => {
+				console.error(error);
+				console.log("ERROR", error);
+			});
+	}, []);
 
 	const GenderIcon = () => {
 		if (patient?.gender === "female") {
@@ -49,6 +69,30 @@ const PatientPage = ({ patients }: Props) => {
 			</div>
 		);
 
+	const handleAddEntrySubmit = async (entryData: EntryForm) => {
+		if (patient && patient.id) {
+			// because I need it to add the entry to
+			try {
+				const updatedPatient = await patientService.addEntryToPatient(
+					patient.id,
+					entryData
+				);
+				setPatient(updatedPatient);
+				setShowAddEntryForm(false);
+				setEntryError("");
+			} catch (error) {
+				const receivedErrors = error.response?.data?.errors || [
+					"An unexpected error occurred",
+				];
+				setEntryError(receivedErrors);
+			}
+		}
+	};
+
+	const handleAddEntryCancel = () => {
+		setShowAddEntryForm(false);
+	};
+
 	return (
 		<div className="App">
 			<Box style={{ marginBottom: "1em", marginTop: "1em" }}>
@@ -62,20 +106,31 @@ const PatientPage = ({ patients }: Props) => {
 			<Box style={{ marginBottom: "0.5em" }}>
 				occupation: {patient?.occupation}
 			</Box>
-			<Box style={{ marginBottom: "0.5em" }}>
-				<Typography variant="h6">entries</Typography>
+			<Box sx={{ my: 2 }}>
+				<Typography variant="h6" sx={{ mb: 2 }}>
+					entries
+				</Typography>
 
-				{patient?.entries?.map((entry, id) => (
-					<Box style={{ marginBottom: "1em", marginTop: "1em" }} key={id}>
-						{entry.date} {entry.description}
-						<Box style={{ marginBottom: "1em", marginTop: "1em" }}>
-							{entry.diagnosisCodes?.map((code) => (
-								<li>{code}</li>
-							))}
-						</Box>
-					</Box>
+				{patient?.entries?.map((entry) => (
+					<EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
 				))}
 			</Box>
+			<Button
+				variant="outlined"
+				color="primary"
+				onClick={() => setShowAddEntryForm(!showAddEntryForm)}
+			>
+				Add Entry
+			</Button>
+			{showAddEntryForm && (
+				<AddEntryForm
+					onCancel={handleAddEntryCancel}
+					patient={patient}
+					entryError={entryError}
+					onSubmit={handleAddEntrySubmit}
+					diagnoses={diagnoses}
+				/>
+			)}
 		</div>
 	);
 };
