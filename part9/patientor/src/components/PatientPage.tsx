@@ -8,17 +8,12 @@ import patientService from "../services/patients";
 import diagnoseService from "../services/diagnoses";
 import EntryDetails from "./EntryDetails";
 import AddEntryForm from "./AddEntryForm";
+import axios from "axios";
 
-interface Props {
-	patients: Patient[];
-	patient: Patient;
-	diagnosis: Diagnosis;
-}
-
-const PatientPage = (): Props => {
+const PatientPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const [patient, setPatient] = useState<Patient | null>(null);
-	const [diagnoses, setDiagnoses] = useState<Diagnosis[] | null>(null);
+	const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [showAddEntryForm, setShowAddEntryForm] = useState(false);
 	const [entryError, setEntryError] = useState("");
@@ -81,10 +76,21 @@ const PatientPage = (): Props => {
 				setShowAddEntryForm(false);
 				setEntryError("");
 			} catch (error) {
-				const receivedErrors = error.response?.data?.errors || [
-					"An unexpected error occurred",
-				];
-				setEntryError(receivedErrors);
+				if (axios.isAxiosError(error)) {
+					if (
+						error?.response?.data &&
+						typeof error?.response?.data === "string"
+					) {
+						const message = error.response.data.replace(
+							"Something went wrong.",
+							""
+						);
+						console.error(message);
+						setEntryError(message);
+					} else {
+						setEntryError("Unrecognized axios error");
+					}
+				}
 			}
 		}
 	};
@@ -125,7 +131,6 @@ const PatientPage = (): Props => {
 			{showAddEntryForm && (
 				<AddEntryForm
 					onCancel={handleAddEntryCancel}
-					patient={patient}
 					entryError={entryError}
 					onSubmit={handleAddEntrySubmit}
 					diagnoses={diagnoses}

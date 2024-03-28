@@ -25,6 +25,6 @@
 	},
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
-		"project": "./part9/patientor-backend/tsconfig.json"
+		"project": "/Users/carinawetzlhuetter/fullstackopen/part9/patientor-backend/tsconfig.json"
 	}
 }

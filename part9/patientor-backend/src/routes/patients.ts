@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import patientService from "../services/patientService";
 import { toNewPatient, validateEntry } from "../../utils";
 import { Entry } from "../types";
@@ -26,25 +26,28 @@ router.post("/", (req, res) => {
 	}
 });
 
-router.post("/:id/entries", (req, res) => {
-	const errors = validateEntry(req.body);
+router.post(
+	"/:id/entries",
+	(req: Request<{ id: string }, unknown, Entry>, res: Response) => {
+		const errors = validateEntry(req.body);
 
-	if (errors.length > 0) {
-		res.status(400).json({ errors });
-	} else
-		try {
-			const patient = patientService.addEntryToPatient(
-				req.params.id,
-				req.body as Entry
-			);
-			if (!patient) {
-				res.status(404).send({ error: "no patient found" });
+		if (errors.length > 0) {
+			res.status(400).json({ errors });
+		} else
+			try {
+				const patient = patientService.addEntryToPatient(
+					req.params.id,
+					req.body
+				);
+				if (!patient) {
+					res.status(404).send({ error: "no patient found" });
+				}
+				res.json(patient);
+			} catch (error) {
+				res.status(500).send({ error: "Internal server error" });
 			}
-			res.json(patient);
-		} catch (error) {
-			res.status(500).send({ error: "Internal server error" });
-		}
-});
+	}
+);
 
 router.get("/:id", (req, res) => {
 	const patient = patientService.findById(req.params.id);

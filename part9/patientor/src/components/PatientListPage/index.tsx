@@ -21,10 +21,9 @@ import patientService from "../../services/patients";
 interface Props {
 	patients: Patient[];
 	setPatients: React.Dispatch<React.SetStateAction<Patient[]>>;
-	patient: Patient;
 }
 
-const PatientListPage = ({ patients, setPatients, patient }: Props) => {
+const PatientListPage = ({ patients, setPatients }: Props) => {
 	const [modalOpen, setModalOpen] = useState<boolean>(false);
 	const [error, setError] = useState<string>();
 

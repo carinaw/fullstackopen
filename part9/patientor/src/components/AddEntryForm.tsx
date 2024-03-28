@@ -1,5 +1,4 @@
-import { useState, SyntheticEvent, useEffect } from "react";
-import diagnosisService from "../services/diagnoses";
+import React, { useState, SyntheticEvent } from "react";
 
 import {
 	TextField,
@@ -72,7 +71,7 @@ const AddEntryForm: React.FC<AddEntryFormProps> = ({
 		"HealthCheck" | "Hospital" | "OccupationalHealthcare"
 	>("HealthCheck");
 	const [healthCheckRating, setHealthCheckRating] =
-		useState<HealthCheckRating | null>(0);
+		useState<HealthCheckRating>(0);
 	const [dischargeDate, setDischargeDate] = useState("");
 	const [dischargeCriteria, setDischargeCriteria] = useState("");
 	const [sickLeaveEndDate, setsickLeaveEndDate] = useState("");
@@ -82,36 +81,41 @@ const AddEntryForm: React.FC<AddEntryFormProps> = ({
 
 	const codes = diagnoses.map((diagnosis) => diagnosis.code);
 
-	const entryTypeRadios = () => {
-		return (
-			<FormControl>
-				<FormLabel component="header">Entry Type</FormLabel>
-				<RadioGroup
-					row
-					aria-label="entryType"
-					name="entryType"
-					value={entryType}
-					onChange={(event) => setEntryType(event.target.value as any)}
-				>
-					<FormControlLabel
-						value="HealthCheck"
-						control={<Radio />}
-						label="Health Check"
-					/>
-					<FormControlLabel
-						value="Hospital"
-						control={<Radio />}
-						label="Hospital"
-					/>
-					<FormControlLabel
-						value="OccupationalHealthcare"
-						control={<Radio />}
-						label="Occupational Healthcare"
-					/>
-				</RadioGroup>
-			</FormControl>
-		);
-	};
+	const entryTypeRadios = () => (
+		<FormControl>
+			<FormLabel component="header">Entry Type</FormLabel>
+			<RadioGroup
+				row
+				aria-label="entryType"
+				name="entryType"
+				value={entryType}
+				onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+					setEntryType(
+						event.target.value as
+							| "HealthCheck"
+							| "Hospital"
+							| "OccupationalHealthcare"
+					)
+				}
+			>
+				<FormControlLabel
+					value="HealthCheck"
+					control={<Radio />}
+					label="Health Check"
+				/>
+				<FormControlLabel
+					value="Hospital"
+					control={<Radio />}
+					label="Hospital"
+				/>
+				<FormControlLabel
+					value="OccupationalHealthcare"
+					control={<Radio />}
+					label="Occupational Healthcare"
+				/>
+			</RadioGroup>
+		</FormControl>
+	);
 
 	const renderHealthCheckFields = () => (
 		<Box>
